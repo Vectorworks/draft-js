@@ -16,6 +16,7 @@ import type ContentState from 'ContentState';
 import type SelectionState from 'SelectionState';
 
 const Immutable = require('immutable');
+const nullthrows = require('nullthrows');
 
 const {Map} = Immutable;
 
@@ -31,7 +32,7 @@ function modifyBlockForContentState(
     .toSeq()
     .skipUntil((_, k) => k === startKey)
     .takeUntil((_, k) => k === endKey)
-    .concat(Map([[endKey, blockMap.get(endKey)]]))
+    .concat(Map([[endKey, nullthrows(blockMap.get(endKey))]]))
     .map(operation);
 
   return contentState.merge({

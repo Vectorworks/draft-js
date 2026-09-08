@@ -17,6 +17,7 @@ const ContentBlockNode = require('ContentBlockNode');
 
 const generateRandomKey = require('generateRandomKey');
 const Immutable = require('immutable');
+const nullthrows = require('nullthrows');
 
 const {OrderedMap} = Immutable;
 
@@ -63,7 +64,7 @@ const randomizeContentBlockNodeKeys = (blockMap: BlockMap): BlockMap => {
           }
 
           if (parentKey && blockMapState.get(parentKey)) {
-            const parentBlock = blockMapState.get(parentKey);
+            const parentBlock = nullthrows(blockMapState.get(parentKey));
             const parentChildrenList = parentBlock.getChildKeys();
             blockMapState.setIn(
               [parentKey, 'children'],
@@ -84,7 +85,7 @@ const randomizeContentBlockNodeKeys = (blockMap: BlockMap): BlockMap => {
               );
             }
 
-            lastRootBlock = blockMapState.get(oldKey);
+            lastRootBlock = nullthrows(blockMapState.get(oldKey));
           }
 
           childrenKeys.forEach(childKey => {
@@ -100,6 +101,7 @@ const randomizeContentBlockNodeKeys = (blockMap: BlockMap): BlockMap => {
           });
         });
       })
+      .valueSeq()
       .toArray()
       .map(block => [
         newKeysRef[block.getKey()],
@@ -110,15 +112,19 @@ const randomizeContentBlockNodeKeys = (blockMap: BlockMap): BlockMap => {
 
 const randomizeContentBlockKeys = (blockMap: BlockMap): BlockMap => {
   return OrderedMap(
-    blockMap.toArray().map(block => {
-      const key = generateRandomKey();
-      return [key, block.set('key', key)];
-    }),
+    blockMap
+      .valueSeq()
+      .toArray()
+      .map(block => {
+        const key = generateRandomKey();
+        return [key, block.set('key', key)];
+      }),
   );
 };
 
 const randomizeBlockMapKeys = (blockMap: BlockMap): BlockMap => {
-  const isTreeBasedBlockMap = blockMap.first() instanceof ContentBlockNode;
+  const isTreeBasedBlockMap =
+    nullthrows(blockMap.first()) instanceof ContentBlockNode;
 
   if (!isTreeBasedBlockMap) {
     return randomizeContentBlockKeys(blockMap);

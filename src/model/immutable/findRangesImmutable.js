@@ -13,6 +13,8 @@
 
 import type {List} from 'immutable';
 
+const NOT_SET = {};
+
 /**
  * Search through an array to find contiguous stretches of elements that
  * match a specified filter function.
@@ -42,7 +44,12 @@ function findRangesImmutable<T>(
     return nextValue;
   });
 
-  filterFn(haystack.last()) && foundFn(cursor, haystack.count());
+  const last = haystack.last(NOT_SET);
+  // `NOT_SET` is only returned for an absent collection entry.
+  // $FlowFixMe[incompatible-call]
+  if (last !== NOT_SET && filterFn(last)) {
+    foundFn(cursor, haystack.count());
+  }
 }
 
 module.exports = findRangesImmutable;

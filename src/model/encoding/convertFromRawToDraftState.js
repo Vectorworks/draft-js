@@ -33,6 +33,7 @@ const generateRandomKey = require('generateRandomKey');
 const gkx = require('gkx');
 const Immutable = require('immutable');
 const invariant = require('invariant');
+const nullthrows = require('nullthrows');
 
 const experimentalTreeDataSupport = gkx('draft_tree_data_support');
 
@@ -308,7 +309,7 @@ const convertFromRawToDraftState = (
   // create initial selection
   const selectionState = blockMap.isEmpty()
     ? new SelectionState()
-    : SelectionState.createEmpty(blockMap.first().getKey());
+    : SelectionState.createEmpty(nullthrows(blockMap.first()).getKey());
 
   return new ContentState({
     blockMap,

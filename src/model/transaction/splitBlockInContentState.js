@@ -21,6 +21,7 @@ const generateRandomKey = require('generateRandomKey');
 const Immutable = require('immutable');
 const invariant = require('invariant');
 const modifyBlockForContentState = require('modifyBlockForContentState');
+const nullthrows = require('nullthrows');
 
 const {List, Map} = Immutable;
 
@@ -95,7 +96,7 @@ const splitBlockInContentState = (
 
   const key = selectionState.getAnchorKey();
   const blockMap = contentState.getBlockMap();
-  const blockToSplit = blockMap.get(key);
+  const blockToSplit = nullthrows(blockMap.get(key));
   const text = blockToSplit.getText();
 
   if (!text) {

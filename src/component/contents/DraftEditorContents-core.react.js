@@ -165,7 +165,7 @@ class DraftEditorContents extends React.Component<Props> {
 
       const direction = textDirectionality
         ? textDirectionality
-        : directionMap.get(key);
+        : nullthrows(directionMap.get(key));
       const offsetKey = DraftOffsetKey.encode(key, 0, 0);
       const componentProps = {
         contentState: content,
@@ -183,12 +183,11 @@ class DraftEditorContents extends React.Component<Props> {
         tree: editorState.getBlockTree(key),
       };
 
-      const configForType =
-        blockRenderMap.get(blockType) || blockRenderMap.get('unstyled');
+      const unstyledConfig = nullthrows(blockRenderMap.get('unstyled'));
+      const configForType = blockRenderMap.get(blockType) || unstyledConfig;
       const wrapperTemplate = configForType.wrapper;
 
-      const Element =
-        configForType.element || blockRenderMap.get('unstyled').element;
+      const Element = configForType.element || unstyledConfig.element;
 
       const depth = block.getDepth();
       let className = '';

@@ -22,6 +22,7 @@ const ContentBlockNode = require('ContentBlockNode');
 const Immutable = require('immutable');
 const insertIntoList = require('insertIntoList');
 const invariant = require('invariant');
+const nullthrows = require('nullthrows');
 const randomizeBlockMapKeys = require('randomizeBlockMapKeys');
 
 const {List} = Immutable;
@@ -39,7 +40,7 @@ const updateExistingBlock = (
   targetOffset: number,
   mergeBlockData?: BlockDataMergeBehavior = 'REPLACE_WITH_NEW_DATA',
 ): ContentState => {
-  const targetBlock = blockMap.get(targetKey);
+  const targetBlock = nullthrows(blockMap.get(targetKey));
   const text = targetBlock.getText();
   const chars = targetBlock.getCharacterList();
   const finalKey = targetKey;
@@ -103,7 +104,7 @@ const updateHead = (
   // Modify head portion of block.
   const headText = text.slice(0, targetOffset);
   const headCharacters = chars.slice(0, targetOffset);
-  const appendToHead = fragment.first();
+  const appendToHead = nullthrows(fragment.first());
 
   return block.merge({
     text: headText + appendToHead.getText(),
@@ -130,7 +131,7 @@ const updateTail = (
   const blockSize = text.length;
   const tailText = text.slice(targetOffset, blockSize);
   const tailCharacters = chars.slice(targetOffset, blockSize);
-  const prependToTail = fragment.last();
+  const prependToTail = nullthrows(fragment.last());
 
   return prependToTail.merge({
     text: prependToTail.getText() + tailText,
@@ -163,7 +164,12 @@ const getRootBlocks = (
     }
 
     rootBlocks.push(lastSiblingKey);
-    rootBlock = blockMap.get(lastSiblingKey);
+    const nextRootBlock = nullthrows(blockMap.get(lastSiblingKey));
+    invariant(
+      nextRootBlock instanceof ContentBlockNode,
+      'Root block must be a ContentBlockNode.',
+    );
+    rootBlock = nextRootBlock;
   }
 
   return rootBlocks;
@@ -195,7 +201,7 @@ const updateBlockMapLinks = (
         fragmentHeadBlock.getNextSiblingKey(),
       );
       blockMapState.setIn(
-        [fragmentHeadBlock.getNextSiblingKey(), 'prevSibling'],
+        [nullthrows(fragmentHeadBlock.getNextSiblingKey()), 'prevSibling'],
         targetKey,
       );
     }
@@ -221,7 +227,11 @@ const updateBlockMapLinks = (
 
     // update targetBlock parent child links
     if (targetParentKey) {
-      const targetParent = blockMap.get(targetParentKey);
+      const targetParent = nullthrows(blockMap.get(targetParentKey));
+      invariant(
+        targetParent instanceof ContentBlockNode,
+        'Target parent must be a ContentBlockNode.',
+      );
       const originalTargetParentChildKeys = targetParent.getChildKeys();
 
       const targetBlockIndex = originalTargetParentChildKeys.indexOf(targetKey);
@@ -248,16 +258,19 @@ const insertFragment = (
   targetKey: string,
   targetOffset: number,
 ): ContentState => {
-  const isTreeBasedBlockMap = blockMap.first() instanceof ContentBlockNode;
+  const isTreeBasedBlockMap =
+    nullthrows(blockMap.first()) instanceof ContentBlockNode;
   const newBlockArr = [];
   const fragmentSize = fragment.size;
-  const target = blockMap.get(targetKey);
-  const head = fragment.first();
-  const tail = fragment.last();
+  const target = nullthrows(blockMap.get(targetKey));
+  const head = nullthrows(fragment.first());
+  const tail = nullthrows(fragment.last());
   const finalOffset = tail.getLength();
   const finalKey = tail.getKey();
   const shouldNotUpdateFromFragmentBlock =
     isTreeBasedBlockMap &&
+    target instanceof ContentBlockNode &&
+    head instanceof ContentBlockNode &&
     (!target.getChildKeys().isEmpty() || !head.getChildKeys().isEmpty());
 
   blockMap.forEach((block, blockKey) => {
@@ -286,7 +299,11 @@ const insertFragment = (
 
   let updatedBlockMap = BlockMapBuilder.createFromArray(newBlockArr);
 
-  if (isTreeBasedBlockMap) {
+  if (
+    isTreeBasedBlockMap &&
+    target instanceof ContentBlockNode &&
+    head instanceof ContentBlockNode
+  ) {
     updatedBlockMap = updateBlockMapLinks(
       updatedBlockMap,
       blockMap,
@@ -324,7 +341,7 @@ const insertFragmentIntoContentState = (
   const targetKey = selectionState.getStartKey();
   const targetOffset = selectionState.getStartOffset();
 
-  const targetBlock = blockMap.get(targetKey);
+  const targetBlock = nullthrows(blockMap.get(targetKey));
 
   if (targetBlock instanceof ContentBlockNode) {
     invariant(
@@ -340,7 +357,7 @@ const insertFragmentIntoContentState = (
       contentState,
       selectionState,
       blockMap,
-      fragment.first(),
+      nullthrows(fragment.first()),
       targetKey,
       targetOffset,
       mergeBlockData,

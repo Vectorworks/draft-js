@@ -36,6 +36,7 @@ const getViewportDimensions = require('getViewportDimensions');
 const Immutable = require('immutable');
 const invariant = require('invariant');
 const isHTMLElement = require('isHTMLElement');
+const nullthrows = require('nullthrows');
 const React = require('react');
 
 const SCROLL_BUFFER = 10;
@@ -134,12 +135,11 @@ const getDraftRenderConfig = (
   block: BlockNodeRecord,
   blockRenderMap: DraftBlockRenderMap,
 ): DraftRenderConfig => {
-  const configForType =
-    blockRenderMap.get(block.getType()) || blockRenderMap.get('unstyled');
+  const unstyledConfig = nullthrows(blockRenderMap.get('unstyled'));
+  const configForType = blockRenderMap.get(block.getType()) || unstyledConfig;
 
   const wrapperTemplate = configForType.wrapper;
-  const Element =
-    configForType.element || blockRenderMap.get('unstyled').element;
+  const Element = configForType.element || unstyledConfig.element;
 
   return {
     Element,

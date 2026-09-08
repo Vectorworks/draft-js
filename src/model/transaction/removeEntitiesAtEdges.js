@@ -17,6 +17,7 @@ import type SelectionState from 'SelectionState';
 import type {List} from 'immutable';
 
 const CharacterMetadata = require('CharacterMetadata');
+const nullthrows = require('nullthrows');
 
 const findRangesImmutable = require('findRangesImmutable');
 const invariant = require('invariant');
@@ -31,7 +32,7 @@ function removeEntitiesAtEdges(
 
   const startKey = selectionState.getStartKey();
   const startOffset = selectionState.getStartOffset();
-  const startBlock = blockMap.get(startKey);
+  const startBlock = nullthrows(blockMap.get(startKey));
   const updatedStart = removeForBlock(contentState, startBlock, startOffset);
 
   if (updatedStart !== startBlock) {
@@ -40,7 +41,7 @@ function removeEntitiesAtEdges(
 
   const endKey = selectionState.getEndKey();
   const endOffset = selectionState.getEndOffset();
-  let endBlock = blockMap.get(endKey);
+  let endBlock = nullthrows(blockMap.get(endKey));
   if (startKey === endKey) {
     endBlock = updatedStart;
   }
@@ -120,7 +121,7 @@ function removeForBlock(
       let {start, end} = getRemovalRange(chars, entityAfterCursor, offset);
       let current;
       while (start < end) {
-        current = chars.get(start);
+        current = nullthrows(chars.get(start));
         chars = chars.set(start, CharacterMetadata.applyEntity(current, null));
         start++;
       }

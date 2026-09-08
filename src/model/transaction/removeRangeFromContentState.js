@@ -22,8 +22,19 @@ const ContentBlockNode = require('ContentBlockNode');
 
 const getNextDelimiterBlockKey = require('getNextDelimiterBlockKey');
 const Immutable = require('immutable');
+const invariant = require('invariant');
+const nullthrows = require('nullthrows');
 
-const {List, Map} = Immutable;
+const {List} = Immutable;
+
+const getBlockNode = (blockMap: BlockMap, key: string): ContentBlockNode => {
+  const block = nullthrows(blockMap.get(key));
+  invariant(
+    block instanceof ContentBlockNode,
+    'Tree block map must contain only ContentBlockNodes.',
+  );
+  return block;
+};
 
 const transformBlock = (
   key: ?string,
@@ -57,8 +68,12 @@ const getAncestorsKeys = (
     return parents;
   }
 
-  let blockNode: ?(BlockNodeRecord | ContentBlock | ContentBlockNode) =
-    blockMap.get(blockKey);
+  let blockNode:
+    | BlockNodeRecord
+    | ContentBlock
+    | ContentBlockNode
+    | null
+    | void = blockMap.get(blockKey);
   while (blockNode && blockNode.getParentKey()) {
     const parentKey = blockNode.getParentKey();
     if (parentKey) {
@@ -86,7 +101,7 @@ const getNextDelimitersBlockKeys = (
 
   let nextDelimiter = getNextDelimiterBlockKey(block, blockMap);
   while (nextDelimiter && blockMap.get(nextDelimiter)) {
-    const block = blockMap.get(nextDelimiter);
+    const block = getBlockNode(blockMap, nextDelimiter);
     nextDelimiters.push(nextDelimiter);
 
     // we do not need to keep checking all root node siblings, just the first occurance
@@ -109,13 +124,15 @@ const getNextValidSibling = (
 
   // note that we need to make sure we refer to the original block since this
   // function is called within a withMutations
-  let nextValidSiblingKey = originalBlockMap
-    .get(block.getKey())
-    .getNextSiblingKey();
+  let nextValidSiblingKey = getBlockNode(
+    originalBlockMap,
+    block.getKey(),
+  ).getNextSiblingKey();
 
   while (nextValidSiblingKey && !blockMap.get(nextValidSiblingKey)) {
     nextValidSiblingKey =
-      originalBlockMap.get(nextValidSiblingKey).getNextSiblingKey() || null;
+      getBlockNode(originalBlockMap, nextValidSiblingKey).getNextSiblingKey() ||
+      null;
   }
 
   return nextValidSiblingKey;
@@ -132,13 +149,15 @@ const getPrevValidSibling = (
 
   // note that we need to make sure we refer to the original block since this
   // function is called within a withMutations
-  let prevValidSiblingKey = originalBlockMap
-    .get(block.getKey())
-    .getPrevSiblingKey();
+  let prevValidSiblingKey = getBlockNode(
+    originalBlockMap,
+    block.getKey(),
+  ).getPrevSiblingKey();
 
   while (prevValidSiblingKey && !blockMap.get(prevValidSiblingKey)) {
     prevValidSiblingKey =
-      originalBlockMap.get(prevValidSiblingKey).getPrevSiblingKey() || null;
+      getBlockNode(originalBlockMap, prevValidSiblingKey).getPrevSiblingKey() ||
+      null;
   }
 
   return prevValidSiblingKey;
@@ -259,7 +278,7 @@ const updateBlockMapLinks = (
         );
       });
       if (newParentKey != null) {
-        const newParent = blockMap.get(newParentKey);
+        const newParent = getBlockNode(blockMap, newParentKey);
         transformBlock(newParentKey, blocks, block =>
           block.merge({
             children: newParent
@@ -272,7 +291,7 @@ const updateBlockMapLinks = (
       // last child of deleted parent should point to next sibling
       transformBlock(
         startBlock.getChildKeys().find(key => {
-          const block = (blockMap.get(key): ContentBlockNode);
+          const block = getBlockNode(blockMap, key);
           return block.getNextSiblingKey() === null;
         }),
         blocks,
@@ -299,16 +318,16 @@ const removeRangeFromContentState = (
   const endKey = selectionState.getEndKey();
   const endOffset = selectionState.getEndOffset();
 
-  const startBlock = blockMap.get(startKey);
-  const endBlock = blockMap.get(endKey);
-
-  // we assume that ContentBlockNode and ContentBlocks are not mixed together
-  const isExperimentalTreeBlock = startBlock instanceof ContentBlockNode;
+  const startBlock = nullthrows(blockMap.get(startKey));
+  const endBlock = nullthrows(blockMap.get(endKey));
 
   // used to retain blocks that should not be deleted to avoid orphan children
   let parentAncestors: Array<string> = [];
 
-  if (isExperimentalTreeBlock) {
+  if (
+    startBlock instanceof ContentBlockNode &&
+    endBlock instanceof ContentBlockNode
+  ) {
     const endBlockchildrenKeys = endBlock.getChildKeys();
     const endBlockAncestors = getAncestorsKeys(endKey, blockMap);
 
@@ -355,27 +374,37 @@ const removeRangeFromContentState = (
   // If cursor (collapsed) is at the start of the first child, delete parent
   // instead of child
   const shouldDeleteParent =
-    isExperimentalTreeBlock &&
+    startBlock instanceof ContentBlockNode &&
+    endBlock instanceof ContentBlockNode &&
     startOffset === 0 &&
     endOffset === 0 &&
     endBlock.getParentKey() === startKey &&
     endBlock.getPrevSiblingKey() == null;
-  const newBlocks = shouldDeleteParent
-    ? Map([[startKey, null]])
-    : blockMap
-        .toSeq()
-        .skipUntil((_, k) => k === startKey)
-        .takeUntil((_, k) => k === endKey)
-        .filter((_, k) => parentAncestors.indexOf(k) === -1)
-        .concat(Map([[endKey, null]]))
-        .map((_, k) => {
-          return k === startKey ? modifiedStart : null;
+  let updatedBlockMap = blockMap;
+  if (shouldDeleteParent) {
+    updatedBlockMap = updatedBlockMap.delete(startKey);
+  } else {
+    if (startKey !== endKey) {
+      blockMap
+        .keySeq()
+        .skipUntil(key => key === startKey)
+        .skip(1)
+        .takeUntil(key => key === endKey)
+        .filter(key => parentAncestors.indexOf(key) === -1)
+        .forEach(key => {
+          updatedBlockMap = updatedBlockMap.delete(key);
         });
-  // $FlowFixMe[incompatible-call] added when improving typing for this parameters
-  let updatedBlockMap = blockMap.merge(newBlocks).filter(block => !!block);
+      updatedBlockMap = updatedBlockMap.delete(endKey);
+    }
+    updatedBlockMap = updatedBlockMap.set(startKey, modifiedStart);
+  }
 
   // Only update tree block pointers if the range is across blocks
-  if (isExperimentalTreeBlock && startBlock !== endBlock) {
+  if (
+    startBlock instanceof ContentBlockNode &&
+    endBlock instanceof ContentBlockNode &&
+    startBlock !== endBlock
+  ) {
     updatedBlockMap = updateBlockMapLinks(
       updatedBlockMap,
       startBlock,

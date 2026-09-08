@@ -56,12 +56,23 @@ Previously, the old API was set to be removed in `v0.11.0`. Since, the plans hav
 
 ## Getting Started
 
+This fork is published to GitHub Packages. Configure the Vectorworks package
+scope in your project's `.npmrc`:
+
+```ini
+@vectorworks:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
 ```
-npm install --save draft-js react react-dom
+
+Set `GITHUB_TOKEN` to a GitHub Packages token with the `read:packages`
+permission. Do not commit a literal token to `.npmrc`.
+
+```
+npm install --save @vectorworks/draft-js react react-dom
 
 or
 
-yarn add draft-js react react-dom
+yarn add @vectorworks/draft-js react react-dom
 ```
 
 Draft.js depends on React and React DOM which must also be installed.
@@ -71,7 +82,7 @@ Draft.js depends on React and React DOM which must also be installed.
 ```javascript
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Editor, EditorState} from 'draft-js';
+import {Editor, EditorState} from '@vectorworks/draft-js';
 
 function MyEditor() {
 
@@ -125,8 +136,8 @@ Since the release of React 16.8, you can use [Hooks](https://reactjs.org/docs/ho
 
 ```js
 import React from "react";
-import { Editor, EditorState } from "draft-js";
-import "draft-js/dist/Draft.css";
+import { Editor, EditorState } from "@vectorworks/draft-js";
+import "@vectorworks/draft-js/dist/Draft.css";
 
 export default function MyEditor() {
   const [editorState, setEditorState] = React.useState(() =>

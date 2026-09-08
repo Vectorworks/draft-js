@@ -18,6 +18,7 @@ import type SelectionState from 'SelectionState';
 const Immutable = require('immutable');
 const insertIntoList = require('insertIntoList');
 const invariant = require('invariant');
+const nullthrows = require('nullthrows');
 
 const {Repeat} = Immutable;
 
@@ -44,7 +45,7 @@ function insertTextIntoContentState(
   const blockMap = contentState.getBlockMap();
   const key = selectionState.getStartKey();
   const offset = selectionState.getStartOffset();
-  const block = blockMap.get(key);
+  const block = nullthrows(blockMap.get(key));
   const blockText = block.getText();
 
   const newBlock = block.merge({

@@ -13,20 +13,35 @@
  */
 import type {BlockMap} from 'BlockMap';
 import type {BlockNodeKey} from 'BlockNode';
-import type ContentBlockNode from 'ContentBlockNode';
+import type ContentBlockNodeType from 'ContentBlockNode';
 
+const ContentBlockNode = require('ContentBlockNode');
 const warning = require('warning');
+const invariant = require('invariant');
+const nullthrows = require('nullthrows');
+
+const getBlockNode = (
+  blockMap: BlockMap,
+  key: BlockNodeKey,
+): ContentBlockNode => {
+  const block = nullthrows(blockMap.get(key));
+  invariant(
+    block instanceof ContentBlockNode,
+    'Tree block map must contain only ContentBlockNodes.',
+  );
+  return (block: ContentBlockNodeType);
+};
 
 const DraftTreeInvariants = {
   /**
    * Check if the block is valid
    */
-  isValidBlock(block: ContentBlockNode, blockMap: BlockMap): boolean {
+  isValidBlock(block: ContentBlockNodeType, blockMap: BlockMap): boolean {
     const key = block.getKey();
     // is its parent's child
     const parentKey = block.getParentKey();
     if (parentKey != null) {
-      const parent = blockMap.get(parentKey);
+      const parent = getBlockNode(blockMap, parentKey);
       if (!parent.getChildKeys().includes(key)) {
         warning(true, 'Tree is missing parent -> child pointer on %s', key);
         return false;
@@ -34,7 +49,7 @@ const DraftTreeInvariants = {
     }
 
     // is its children's parent
-    const children = block.getChildKeys().map(k => blockMap.get(k));
+    const children = block.getChildKeys().map(k => getBlockNode(blockMap, k));
     if (!children.every(c => c.getParentKey() === key)) {
       warning(true, 'Tree is missing child -> parent pointer on %s', key);
       return false;
@@ -43,7 +58,7 @@ const DraftTreeInvariants = {
     // is its previous sibling's next sibling
     const prevSiblingKey = block.getPrevSiblingKey();
     if (prevSiblingKey != null) {
-      const prevSibling = blockMap.get(prevSiblingKey);
+      const prevSibling = getBlockNode(blockMap, prevSiblingKey);
       if (prevSibling.getNextSiblingKey() !== key) {
         warning(
           true,
@@ -57,7 +72,7 @@ const DraftTreeInvariants = {
     // is its next sibling's previous sibling
     const nextSiblingKey = block.getNextSiblingKey();
     if (nextSiblingKey != null) {
-      const nextSibling = blockMap.get(nextSiblingKey);
+      const nextSibling = getBlockNode(blockMap, nextSiblingKey);
       if (nextSibling.getPrevSiblingKey() !== key) {
         warning(
           true,
@@ -95,6 +110,7 @@ const DraftTreeInvariants = {
   isConnectedTree(blockMap: BlockMap): boolean {
     // exactly one node has no previous sibling + no parent
     const eligibleFirstNodes = blockMap
+      .valueSeq()
       .toArray()
       .filter(
         block =>
@@ -104,12 +120,12 @@ const DraftTreeInvariants = {
       warning(true, 'Tree is not connected. More or less than one first node');
       return false;
     }
-    const firstNode = eligibleFirstNodes.shift();
+    const firstNode = nullthrows(eligibleFirstNodes.shift());
     let nodesSeen = 0;
-    let currentKey: ?($FlowFixMe | BlockNodeKey) = firstNode.getKey();
-    const visitedStack: Array<$FlowFixMe | BlockNodeKey> = [];
+    let currentKey: ?BlockNodeKey = firstNode.getKey();
+    const visitedStack: Array<BlockNodeKey> = [];
     while (currentKey != null) {
-      const currentNode = blockMap.get(currentKey);
+      const currentNode = getBlockNode(blockMap, currentKey);
       const childKeys = currentNode.getChildKeys();
       const nextSiblingKey = currentNode.getNextSiblingKey();
       // if the node has children, add parent's next sibling to stack and go to children
@@ -117,7 +133,7 @@ const DraftTreeInvariants = {
         if (nextSiblingKey != null) {
           visitedStack.unshift(nextSiblingKey);
         }
-        const children = childKeys.map(k => blockMap.get(k));
+        const children = childKeys.map(k => getBlockNode(blockMap, k));
         const firstNode = children.find(
           block => block.getPrevSiblingKey() == null,
         );
@@ -154,7 +170,7 @@ const DraftTreeInvariants = {
    * Checks that the block map is a connected tree with valid blocks
    */
   isValidTree(blockMap: BlockMap): boolean {
-    const blocks = blockMap.toArray();
+    const blocks = blockMap.valueSeq().toArray();
     if (
       !blocks.every(block => DraftTreeInvariants.isValidBlock(block, blockMap))
     ) {

@@ -18,6 +18,7 @@ import type {DraftEditorCommand} from 'DraftEditorCommand';
 import type {DataObjectForLink, RichTextUtils} from 'RichTextUtils';
 import type SelectionState from 'SelectionState';
 import type URI from 'URI';
+import type ContentBlockNodeType from 'ContentBlockNode';
 
 const ContentBlockNode = require('ContentBlockNode');
 const DraftModifier = require('DraftModifier');
@@ -28,10 +29,23 @@ const RichTextEditorUtil = require('RichTextEditorUtil');
 const adjustBlockDepthForContentState = require('adjustBlockDepthForContentState');
 const generateRandomKey = require('generateRandomKey');
 const invariant = require('invariant');
+const nullthrows = require('nullthrows');
 
 // Eventually we could allow to control this list by either allowing user configuration
 // and/or a schema in conjunction to DraftBlockRenderMap
 const NESTING_DISABLED_TYPES = ['code-block', 'atomic'];
+
+const getBlockNode = (
+  blockMap: BlockMap,
+  key: string,
+): ContentBlockNodeType => {
+  const block = nullthrows(blockMap.get(key));
+  invariant(
+    block instanceof ContentBlockNode,
+    'Tree block map must contain only ContentBlockNodes.',
+  );
+  return (block: ContentBlockNodeType);
+};
 
 const NestedRichTextEditorUtil: RichTextUtils = {
   handleKeyCommand: (
@@ -170,7 +184,9 @@ const NestedRichTextEditorUtil: RichTextUtils = {
       return EditorState.push(
         editorState,
         withoutBlockStyle,
-        withoutBlockStyle.getBlockMap().get(currentBlock.getKey()).getType() ===
+        nullthrows(
+          withoutBlockStyle.getBlockMap().get(currentBlock.getKey()),
+        ).getType() ===
           'unstyled'
           ? 'change-block-type'
           : 'adjust-depth',
@@ -467,7 +483,7 @@ const NestedRichTextEditorUtil: RichTextUtils = {
           let newBlockMap = onUntab(content.getBlockMap(), block);
           newBlockMap = newBlockMap.set(
             key,
-            newBlockMap.get(key).merge({depth: depth - 1}),
+            getBlockNode(newBlockMap, key).merge({depth: depth - 1}),
           );
           return content.merge({blockMap: newBlockMap});
         }
@@ -485,7 +501,7 @@ const onUntab = (blockMap: BlockMap, block: ContentBlockNode): BlockMap => {
   if (parentKey == null) {
     return blockMap;
   }
-  const parent = blockMap.get(parentKey);
+  const parent = getBlockNode(blockMap, parentKey);
   const existingChildren = parent.getChildKeys();
   const blockIndex = existingChildren.indexOf(key);
   if (blockIndex === 0 || blockIndex === existingChildren.count() - 1) {
@@ -526,7 +542,7 @@ const onUntab = (blockMap: BlockMap, block: ContentBlockNode): BlockMap => {
       .set(key, block.merge({nextSibling: null}))
       .set(
         nextSiblingKey,
-        blockMap.get(nextSiblingKey).merge({prevSibling: null}),
+        getBlockNode(blockMap, nextSiblingKey).merge({prevSibling: null}),
       );
     const parentNextSiblingKey = parent.getNextSiblingKey();
     if (parentNextSiblingKey != null) {
@@ -549,11 +565,11 @@ const onUntab = (blockMap: BlockMap, block: ContentBlockNode): BlockMap => {
   let childWasUntabbed = false;
   if (parentKey != null) {
     let parent = blockMap.get(parentKey);
-    while (parent != null) {
+    while (parent instanceof ContentBlockNode) {
       const children = parent.getChildKeys();
       const firstChildKey = children.first();
       invariant(firstChildKey != null, 'parent must have at least one child');
-      const firstChild = blockMap.get(firstChildKey);
+      const firstChild = getBlockNode(blockMap, firstChildKey);
       if (firstChild.getChildKeys().count() === 0) {
         break;
       } else {
@@ -568,14 +584,14 @@ const onUntab = (blockMap: BlockMap, block: ContentBlockNode): BlockMap => {
   // next to each other
   if (childWasUntabbed && parentKey != null) {
     const parent = blockMap.get(parentKey);
-    const prevSiblingKey =
-      parent != null // parent may have been deleted
-        ? parent.getPrevSiblingKey()
-        : null;
-    if (prevSiblingKey != null && parent.getChildKeys().count() > 0) {
-      const prevSibling = blockMap.get(prevSiblingKey);
-      if (prevSibling != null && prevSibling.getChildKeys().count() > 0) {
-        blockMap = DraftTreeOperations.mergeBlocks(blockMap, prevSiblingKey);
+    if (parent != null) {
+      const parentNode = getBlockNode(blockMap, parentKey);
+      const prevSiblingKey = parentNode.getPrevSiblingKey();
+      if (prevSiblingKey != null && parentNode.getChildKeys().count() > 0) {
+        const prevSibling = blockMap.get(prevSiblingKey);
+        if (prevSibling != null && prevSibling.getChildKeys().count() > 0) {
+          blockMap = DraftTreeOperations.mergeBlocks(blockMap, prevSiblingKey);
+        }
       }
     }
   }

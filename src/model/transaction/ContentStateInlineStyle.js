@@ -15,6 +15,7 @@ import type ContentState from 'ContentState';
 import type SelectionState from 'SelectionState';
 
 const CharacterMetadata = require('CharacterMetadata');
+const nullthrows = require('nullthrows');
 
 const {Map} = require('immutable');
 
@@ -51,7 +52,7 @@ function modifyInlineStyle(
   const newBlocks = blockMap
     .skipUntil((_, k) => k === startKey)
     .takeUntil((_, k) => k === endKey)
-    .concat(Map([[endKey, blockMap.get(endKey)]]))
+    .concat(Map([[endKey, nullthrows(blockMap.get(endKey))]]))
     .map((block, blockKey) => {
       let sliceStart;
       let sliceEnd;
@@ -67,7 +68,7 @@ function modifyInlineStyle(
       let chars = block.getCharacterList();
       let current;
       while (sliceStart < sliceEnd) {
-        current = chars.get(sliceStart);
+        current = nullthrows(chars.get(sliceStart));
         chars = chars.set(
           sliceStart,
           addOrRemove

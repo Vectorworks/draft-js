@@ -53,7 +53,7 @@ selection within the editor will create new `EditorState` objects. Note that
 this remains efficient due to data persistence across immutable objects.
 
 ```js
-import {Editor, EditorState} from 'draft-js';
+import {Editor, EditorState} from '@vectorworks/draft-js';
 
 const MyInput = () => {
   const [editorState, setEditorState] = useState(() =>

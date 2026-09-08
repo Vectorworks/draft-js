@@ -31,6 +31,7 @@ const generateRandomKey = require('generateRandomKey');
 const getOwnObjectValues = require('getOwnObjectValues');
 const gkx = require('gkx');
 const Immutable = require('immutable');
+const nullthrows = require('nullthrows');
 const sanitizeDraftText = require('sanitizeDraftText');
 
 const {List, Record, Repeat, Map: ImmutableMap, OrderedMap} = Immutable;
@@ -94,8 +95,7 @@ class ContentState extends ContentStateRecord {
   }
 
   getBlockForKey(key: string): BlockNodeRecord {
-    const block: BlockNodeRecord = this.getBlockMap().get(key);
-    return block;
+    return nullthrows(this.getBlockMap().get(key));
   }
 
   getKeyBefore(key: string): ?string {
@@ -131,15 +131,17 @@ class ContentState extends ContentStateRecord {
   }
 
   getBlocksAsArray(): Array<BlockNodeRecord> {
-    return this.getBlockMap().toArray();
+    return this.getBlockMap()
+      .valueSeq()
+      .toArray();
   }
 
   getFirstBlock(): BlockNodeRecord {
-    return this.getBlockMap().first();
+    return nullthrows(this.getBlockMap().first());
   }
 
   getLastBlock(): BlockNodeRecord {
-    return this.getBlockMap().last();
+    return nullthrows(this.getBlockMap().last());
   }
 
   getPlainText(delimiter?: string): string {
@@ -160,7 +162,8 @@ class ContentState extends ContentStateRecord {
     return (
       blockMap.size > 1 ||
       // make sure that there are no zero width space chars
-      escape(blockMap.first().getText()).replace(/%u200B/g, '').length > 0
+      escape(nullthrows(blockMap.first()).getText()).replace(/%u200B/g, '')
+        .length > 0
     );
   }
 
@@ -256,7 +259,7 @@ class ContentState extends ContentStateRecord {
     const blockMap = BlockMapBuilder.createFromArray(theBlocks);
     const selectionState = blockMap.isEmpty()
       ? new SelectionState()
-      : SelectionState.createEmpty(blockMap.first().getKey());
+      : SelectionState.createEmpty(nullthrows(blockMap.first()).getKey());
     return new ContentState({
       blockMap,
       entityMap: entityMap || DraftEntity,
@@ -285,7 +288,9 @@ class ContentState extends ContentStateRecord {
   static fromJS(state: ContentStateRawType): ContentState {
     return new ContentState({
       ...state,
-      blockMap: OrderedMap<string, BlockNodeRawConfig>(state.blockMap).map(
+      blockMap: OrderedMap<string, BlockNodeRawConfig>(
+        state.blockMap || OrderedMap<string, BlockNodeRawConfig>(),
+      ).map(
         // $FlowFixMe[method-unbinding]
         ContentState.createContentBlockFromJS,
       ),

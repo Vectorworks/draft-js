@@ -14,6 +14,7 @@
 import type {BlockNodeRecord} from 'BlockNodeRecord';
 
 const CharacterMetadata = require('CharacterMetadata');
+const nullthrows = require('nullthrows');
 
 function applyEntityToContentBlock(
   contentBlock: BlockNodeRecord,
@@ -26,7 +27,10 @@ function applyEntityToContentBlock(
   while (start < end) {
     characterList = characterList.set(
       start,
-      CharacterMetadata.applyEntity(characterList.get(start), entityKey),
+      CharacterMetadata.applyEntity(
+        nullthrows(characterList.get(start)),
+        entityKey,
+      ),
     );
     start++;
   }

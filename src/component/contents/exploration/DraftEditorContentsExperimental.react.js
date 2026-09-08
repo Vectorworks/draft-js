@@ -144,7 +144,7 @@ class DraftEditorContentsExperimental extends React.Component<Props> {
 
       const configForType =
         blockRenderMap.get(nodeBlock.getType()) ||
-        blockRenderMap.get('unstyled');
+        nullthrows(blockRenderMap.get('unstyled'));
       const wrapperTemplate = configForType.wrapper;
       processedBlocks.push({
         /* $FlowFixMe[incompatible-type] (>=0.112.0 site=www,mobile) This

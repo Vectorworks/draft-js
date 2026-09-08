@@ -187,12 +187,15 @@ const DraftEditorCompositionHandler = {
 
     let contentState = editorState.getCurrentContent();
     mutations.forEach((composedChars, offsetKey) => {
-      const {blockKey, decoratorKey, leafKey} =
-        DraftOffsetKey.decode(offsetKey);
+      const {blockKey, decoratorKey, leafKey} = DraftOffsetKey.decode(
+        offsetKey,
+      );
 
-      const {start, end} = editorState
-        .getBlockTree(blockKey)
-        .getIn([decoratorKey, 'leaves', leafKey]);
+      const {start, end} = nullthrows(
+        editorState
+          .getBlockTree(blockKey)
+          .getIn([decoratorKey, 'leaves', leafKey]),
+      );
 
       const replacementRange = editorState.getSelection().merge({
         anchorKey: blockKey,

@@ -16,6 +16,7 @@ const DraftEntityInstance = require('DraftEntityInstance');
 
 const Immutable = require('immutable');
 const invariant = require('invariant');
+const nullthrows = require('nullthrows');
 const uuid = require('uuid');
 
 const {OrderedMap} = Immutable;
@@ -139,7 +140,7 @@ const DraftEntity: DraftEntityMapObject = {
   },
 
   last(): DraftEntityInstance {
-    return instances.last();
+    return nullthrows(instances.last());
   },
 
   /**

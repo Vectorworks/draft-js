@@ -24,6 +24,7 @@ const DraftOffsetKey = require('DraftOffsetKey');
 const UnicodeBidi = require('UnicodeBidi');
 const UnicodeBidiDirection = require('UnicodeBidiDirection');
 
+const nullthrows = require('nullthrows');
 const React = require('react');
 
 type Props = {
@@ -52,7 +53,7 @@ class DraftEditorDecoratedLeaves extends React.Component<Props> {
     } = this.props;
 
     const blockKey = block.getKey();
-    const leavesForLeafSet = leafSet.get('leaves');
+    const leavesForLeafSet = nullthrows(leafSet.get('leaves'));
     const DecoratorComponent = decorator.getComponentForKey(decoratorKey);
     const decoratorProps = decorator.getPropsForKey(decoratorKey);
     const decoratorOffsetKey = DraftOffsetKey.encode(
@@ -80,7 +81,7 @@ class DraftEditorDecoratedLeaves extends React.Component<Props> {
         decoratedText={decoratedText}
         dir={dir}
         key={decoratorOffsetKey}
-        entityKey={block.getEntityAt(leafSet.get('start'))}
+        entityKey={block.getEntityAt(nullthrows(leafSet.get('start')))}
         offsetKey={decoratorOffsetKey}>
         {children}
       </DecoratorComponent>
