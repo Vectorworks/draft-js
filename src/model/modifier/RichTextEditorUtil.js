@@ -22,7 +22,7 @@ const DraftModifier = require('DraftModifier');
 const EditorState = require('EditorState');
 
 const adjustBlockDepthForContentState = require('adjustBlockDepthForContentState');
-const nullthrows = require('nullthrows');
+const invariant = require('invariant');
 
 const RichTextEditorUtil: RichTextUtils = {
   currentBlockContainsLink(editorState: EditorState): boolean {
@@ -234,7 +234,11 @@ const RichTextEditorUtil: RichTextUtils = {
     // we should avoid toggling block type for the trailing block because it
     // is a confusing interaction.
     if (startKey !== endKey && selection.getEndOffset() === 0) {
-      const blockBefore = nullthrows(content.getBlockBefore(endKey));
+      const blockBefore = content.getBlockBefore(endKey);
+      invariant(
+        blockBefore != null,
+        'Expected a block before the selection end block.',
+      );
       endKey = blockBefore.getKey();
       target = target.merge({
         anchorKey: startKey,

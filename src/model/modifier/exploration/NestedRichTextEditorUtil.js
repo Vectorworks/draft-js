@@ -29,7 +29,6 @@ const RichTextEditorUtil = require('RichTextEditorUtil');
 const adjustBlockDepthForContentState = require('adjustBlockDepthForContentState');
 const generateRandomKey = require('generateRandomKey');
 const invariant = require('invariant');
-const nullthrows = require('nullthrows');
 
 // Eventually we could allow to control this list by either allowing user configuration
 // and/or a schema in conjunction to DraftBlockRenderMap
@@ -39,7 +38,8 @@ const getBlockNode = (
   blockMap: BlockMap,
   key: string,
 ): ContentBlockNodeType => {
-  const block = nullthrows(blockMap.get(key));
+  const block = blockMap.get(key);
+  invariant(block != null, 'Expected tree block with key %s to exist.', key);
   invariant(
     block instanceof ContentBlockNode,
     'Tree block map must contain only ContentBlockNodes.',
@@ -182,12 +182,17 @@ const NestedRichTextEditorUtil: RichTextUtils = {
     );
 
     if (withoutBlockStyle) {
+      const updatedBlock = withoutBlockStyle
+        .getBlockMap()
+        .get(currentBlock.getKey());
+      invariant(
+        updatedBlock != null,
+        'Expected current block to exist after removing its style.',
+      );
       return EditorState.push(
         editorState,
         withoutBlockStyle,
-        nullthrows(
-          withoutBlockStyle.getBlockMap().get(currentBlock.getKey()),
-        ).getType() === 'unstyled'
+        updatedBlock.getType() === 'unstyled'
           ? 'change-block-type'
           : 'adjust-depth',
       );

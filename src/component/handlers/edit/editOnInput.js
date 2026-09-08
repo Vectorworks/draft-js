@@ -22,7 +22,7 @@ const UserAgent = require('UserAgent');
 const {notEmptyKey} = require('draftKeyUtils');
 const findAncestorOffsetKey = require('findAncestorOffsetKey');
 const keyCommandPlainBackspace = require('keyCommandPlainBackspace');
-const nullthrows = require('nullthrows');
+const invariant = require('invariant');
 
 const isGecko = UserAgent.isEngine('Gecko');
 
@@ -109,12 +109,18 @@ function editOnInput(editor: DraftEditor, event: ?SyntheticInputEvent<>): void {
 
   let domText = anchorNode.textContent;
   const editorState = editor._latestEditorState;
-  const offsetKey = nullthrows(findAncestorOffsetKey(anchorNode));
+  const offsetKey = findAncestorOffsetKey(anchorNode);
+  invariant(
+    offsetKey != null,
+    'Expected input event target to be within an editor leaf.',
+  );
   const {blockKey, decoratorKey, leafKey} = DraftOffsetKey.decode(offsetKey);
 
-  const {start, end} = nullthrows(
-    editorState.getBlockTree(blockKey).getIn([decoratorKey, 'leaves', leafKey]),
-  );
+  const leaf = editorState
+    .getBlockTree(blockKey)
+    .getIn([decoratorKey, 'leaves', leafKey]);
+  invariant(leaf != null, 'Expected input event to reference an editor leaf.');
+  const {start, end} = leaf;
 
   const content = editorState.getCurrentContent();
   const block = content.getBlockForKey(blockKey);

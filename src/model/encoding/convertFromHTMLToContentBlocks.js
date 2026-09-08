@@ -32,7 +32,7 @@ const isHTMLAnchorElement = require('isHTMLAnchorElement');
 const isHTMLBRElement = require('isHTMLBRElement');
 const isHTMLElement = require('isHTMLElement');
 const isHTMLImageElement = require('isHTMLImageElement');
-const nullthrows = require('nullthrows');
+const invariant = require('invariant');
 
 const experimentalTreeDataSupport = gkx('draft_tree_data_support');
 const allowPastingAltText = gkx('draftjs_paste_emojis');
@@ -518,9 +518,13 @@ class ContentBlocksBuilder {
 
       let newStyle = style;
       if (HTMLTagToRawInlineStyleMap.has(nodeName)) {
-        newStyle = newStyle.add(
-          nullthrows(HTMLTagToRawInlineStyleMap.get(nodeName)),
+        const inlineStyle = HTMLTagToRawInlineStyleMap.get(nodeName);
+        invariant(
+          inlineStyle != null,
+          'Expected inline style for HTML tag %s.',
+          nodeName,
         );
+        newStyle = newStyle.add(inlineStyle);
       }
       newStyle = styleFromNodeAttributes(node, newStyle);
       const inlineStyle = detectInlineStyle(node);
@@ -767,7 +771,12 @@ class ContentBlocksBuilder {
       characterList = characterList.concat(config.characterList);
       if (text !== '' && config.type !== 'unstyled') {
         text += '\n';
-        characterList = characterList.push(nullthrows(characterList.last()));
+        const lastCharacter = characterList.last();
+        invariant(
+          lastCharacter != null,
+          'Expected character metadata after adding block text.',
+        );
+        characterList = characterList.push(lastCharacter);
       }
       const children = this._extractTextFromBlockConfigs(config.childConfigs);
       text += children.text;

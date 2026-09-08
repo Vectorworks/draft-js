@@ -15,7 +15,7 @@ import type ContentState from 'ContentState';
 import type SelectionState from 'SelectionState';
 
 const CharacterMetadata = require('CharacterMetadata');
-const nullthrows = require('nullthrows');
+const invariant = require('invariant');
 
 const {Map} = require('immutable');
 
@@ -48,11 +48,13 @@ function modifyInlineStyle(
   const startOffset = selectionState.getStartOffset();
   const endKey = selectionState.getEndKey();
   const endOffset = selectionState.getEndOffset();
+  const endBlock = blockMap.get(endKey);
+  invariant(endBlock != null, 'Expected selection end block to exist.');
 
   const newBlocks = blockMap
     .skipUntil((_, k) => k === startKey)
     .takeUntil((_, k) => k === endKey)
-    .concat(Map([[endKey, nullthrows(blockMap.get(endKey))]]))
+    .concat(Map([[endKey, endBlock]]))
     .map((block, blockKey) => {
       let sliceStart;
       let sliceEnd;
@@ -68,7 +70,12 @@ function modifyInlineStyle(
       let chars = block.getCharacterList();
       let current;
       while (sliceStart < sliceEnd) {
-        current = nullthrows(chars.get(sliceStart));
+        current = chars.get(sliceStart);
+        invariant(
+          current != null,
+          'Expected character metadata at selection offset %s.',
+          sliceStart,
+        );
         chars = chars.set(
           sliceStart,
           addOrRemove

@@ -98,7 +98,7 @@ class DraftJsPlaygroundContainer extends React.Component {
     this.state = {
       mode: 'rawContent',
       editorState: EditorState.createEmpty(),
-      codeMirrorValue: BASE_CONTENT['rawContent'],
+      codeMirrorValue: BASE_CONTENT.rawContent,
       showAllState: false,
     };
   }
@@ -152,7 +152,7 @@ class DraftJsPlaygroundContainer extends React.Component {
     try {
       const parsedJson = JSON.parse(rawContent);
       this._setContentBlock(convertFromRaw(parsedJson));
-    } catch (err) {
+    } catch (_err) {
       alert('The json is invalid');
     }
   }

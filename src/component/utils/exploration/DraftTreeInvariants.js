@@ -18,13 +18,13 @@ import type ContentBlockNodeType from 'ContentBlockNode';
 const ContentBlockNode = require('ContentBlockNode');
 const warning = require('warning');
 const invariant = require('invariant');
-const nullthrows = require('nullthrows');
 
 const getBlockNode = (
   blockMap: BlockMap,
   key: BlockNodeKey,
 ): ContentBlockNode => {
-  const block = nullthrows(blockMap.get(key));
+  const block = blockMap.get(key);
+  invariant(block != null, 'Expected tree block with key %s to exist.', key);
   invariant(
     block instanceof ContentBlockNode,
     'Tree block map must contain only ContentBlockNodes.',
@@ -120,7 +120,11 @@ const DraftTreeInvariants = {
       warning(true, 'Tree is not connected. More or less than one first node');
       return false;
     }
-    const firstNode = nullthrows(eligibleFirstNodes.shift());
+    const firstNode = eligibleFirstNodes.shift();
+    invariant(
+      firstNode != null,
+      'Expected connected tree to have a first node.',
+    );
     let nodesSeen = 0;
     let currentKey: ?BlockNodeKey = firstNode.getKey();
     const visitedStack: Array<BlockNodeKey> = [];

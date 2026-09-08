@@ -31,7 +31,7 @@ const generateRandomKey = require('generateRandomKey');
 const getOwnObjectValues = require('getOwnObjectValues');
 const gkx = require('gkx');
 const Immutable = require('immutable');
-const nullthrows = require('nullthrows');
+const invariant = require('invariant');
 const sanitizeDraftText = require('sanitizeDraftText');
 
 const {List, Record, Repeat, Map: ImmutableMap, OrderedMap} = Immutable;
@@ -138,11 +138,21 @@ class ContentState extends ContentStateRecord {
   }
 
   getFirstBlock(): BlockNodeRecord {
-    return nullthrows(this.getBlockMap().first());
+    const firstBlock = this.getBlockMap().first();
+    invariant(
+      firstBlock != null,
+      'Expected content state to contain a first block.',
+    );
+    return firstBlock;
   }
 
   getLastBlock(): BlockNodeRecord {
-    return nullthrows(this.getBlockMap().last());
+    const lastBlock = this.getBlockMap().last();
+    invariant(
+      lastBlock != null,
+      'Expected content state to contain a last block.',
+    );
+    return lastBlock;
   }
 
   getPlainText(delimiter?: string): string {
@@ -160,11 +170,12 @@ class ContentState extends ContentStateRecord {
 
   hasText(): boolean {
     const blockMap = this.getBlockMap();
+    const firstBlock = blockMap.first();
+    invariant(firstBlock != null, 'Expected content state to contain a block.');
     return (
       blockMap.size > 1 ||
       // make sure that there are no zero width space chars
-      escape(nullthrows(blockMap.first()).getText()).replace(/%u200B/g, '')
-        .length > 0
+      escape(firstBlock.getText()).replace(/%u200B/g, '').length > 0
     );
   }
 
@@ -258,9 +269,15 @@ class ContentState extends ContentStateRecord {
     // TODO: remove this when we completely deprecate the old entity API
     const theBlocks = Array.isArray(blocks) ? blocks : blocks.contentBlocks;
     const blockMap = BlockMapBuilder.createFromArray(theBlocks);
-    const selectionState = blockMap.isEmpty()
-      ? new SelectionState()
-      : SelectionState.createEmpty(nullthrows(blockMap.first()).getKey());
+    let selectionState = new SelectionState();
+    if (!blockMap.isEmpty()) {
+      const firstBlock = blockMap.first();
+      invariant(
+        firstBlock != null,
+        'Expected non-empty block map to contain a block.',
+      );
+      selectionState = SelectionState.createEmpty(firstBlock.getKey());
+    }
     return new ContentState({
       blockMap,
       entityMap: entityMap || DraftEntity,

@@ -1,0 +1,242 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.5.12/schema.json",
+	"vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+	"files": {
+		"includes": [
+			"**/*.js",
+			"!src/**",
+			"!lib/**",
+			"!dist/**",
+			"!docs/**",
+			"!node_modules/**",
+			"!website/**"
+		]
+	},
+	"formatter": {
+		"enabled": true,
+		"formatWithErrors": false,
+		"indentStyle": "space",
+		"indentWidth": 2,
+		"lineEnding": "lf",
+		"lineWidth": 80,
+		"attributePosition": "auto",
+		"bracketSameLine": true,
+		"bracketSpacing": true,
+		"expand": "auto",
+		"useEditorconfig": true
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"preset": "none",
+			"a11y": {
+				"noAccessKey": "off",
+				"noAriaUnsupportedElements": "off",
+				"noAutofocus": "off",
+				"noDistractingElements": "off",
+				"noHeaderScope": "off",
+				"noInteractiveElementToNoninteractiveRole": "warn",
+				"noNoninteractiveElementInteractions": "warn",
+				"noNoninteractiveElementToInteractiveRole": "warn",
+				"noNoninteractiveTabindex": "warn",
+				"noPositiveTabindex": "warn",
+				"noRedundantAlt": "off",
+				"noRedundantRoles": "off",
+				"noStaticElementInteractions": "warn",
+				"useAnchorContent": "off",
+				"useAriaActivedescendantWithTabindex": "off",
+				"useAriaPropsForRole": "warn",
+				"useAriaPropsSupportedByRole": "warn",
+				"useFocusableInteractive": "warn",
+				"useHeadingContent": "off",
+				"useHtmlLang": "off",
+				"useIframeTitle": "off",
+				"useKeyWithClickEvents": "off",
+				"useKeyWithMouseEvents": "off",
+				"useValidAriaProps": "warn",
+				"useValidAriaRole": "warn",
+				"useValidAriaValues": "off",
+				"useValidLang": "off"
+			},
+			"complexity": {
+				"noAdjacentSpacesInRegex": "warn",
+				"noCommaOperator": "warn",
+				"noDivRegex": "off",
+				"noExtraBooleanCast": "warn",
+				"noImplicitCoercions": "off",
+				"noUselessLoneBlockStatements": "warn",
+				"noUselessStringConcat": "warn",
+				"noUselessTernary": "warn",
+				"noUselessUndefinedInitialization": "off",
+				"noVoid": "off",
+				"useLiteralKeys": "warn",
+				"useMaxParams": "off"
+			},
+			"correctness": {
+				"noConstAssign": "error",
+				"noConstantCondition": "off",
+				"noEmptyCharacterClassInRegex": "warn",
+				"noEmptyPattern": "warn",
+				"noGlobalObjectCalls": "error",
+				"noInnerDeclarations": "off",
+				"noInvalidConstructorSuper": "error",
+				"noInvalidUseBeforeDeclaration": "off",
+				"noSwitchDeclarations": "off",
+				"noUndeclaredVariables": "error",
+				"noUnreachable": "error",
+				"noUnreachableSuper": "error",
+				"noUnusedInstantiation": "warn",
+				"noUnusedVariables": "warn",
+				"useIsNan": "error",
+				"useJsxKeyInIterable": "off",
+				"useParseIntRadix": "warn",
+				"useValidTypeof": "error",
+				"useYield": "off"
+			},
+			"security": {
+				"noDangerouslySetInnerHtml": "off",
+				"noGlobalEval": "error",
+				"noScriptUrl": "error"
+			},
+			"style": {
+				"noContinue": "off",
+				"noIncrementDecrement": "off",
+				"noJsxLiterals": "off",
+				"noMultilineString": "error",
+				"noNegationElse": "off",
+				"noNestedTernary": "off",
+				"noParameterAssign": "off",
+				"noTernary": "off",
+				"noYodaExpression": "off",
+				"useArrayLiterals": "error",
+				"useBlockStatements": "warn",
+				"useCollapsedElseIf": "off",
+				"useConsistentArrowReturn": "off",
+				"useConsistentBuiltinInstantiation": "warn",
+				"useConst": "off",
+				"useDefaultSwitchClause": "off",
+				"useShorthandAssign": "warn",
+				"useSingleVarDeclarator": "warn",
+				"useSpreadOverApply": "off",
+				"useTemplate": "off"
+			},
+			"suspicious": {
+				"noAlert": "off",
+				"noBitwiseOperators": "warn",
+				"noCatchAssign": "warn",
+				"noClassAssign": "warn",
+				"noConsole": {
+					"level": "warn",
+					"options": {
+						"allow": ["warn", "error", "time", "timeEnd", "timeStamp"]
+					}
+				},
+				"noControlCharactersInRegex": "off",
+				"noDebugger": "error",
+				"noDoubleEquals": "off",
+				"noDuplicateCase": "warn",
+				"noDuplicateClassMembers": "error",
+				"noDuplicateJsxProps": "error",
+				"noDuplicateObjectKeys": "error",
+				"noDuplicateParameters": "error",
+				"noEmptyBlockStatements": "off",
+				"noEqualsToNull": "off",
+				"noFallthroughSwitchClause": "warn",
+				"noFunctionAssign": "error",
+				"noIrregularWhitespace": "warn",
+				"noLabelVar": "warn",
+				"noOctalEscape": "warn",
+				"noProto": "error",
+				"noRedeclare": "warn",
+				"noReturnAssign": "off",
+				"noSelfCompare": "warn",
+				"noShadow": "off",
+				"noShadowRestrictedNames": "warn",
+				"noSparseArray": "error",
+				"noUnknownAttribute": "off",
+				"noUnusedExpressions": "off",
+				"noVar": "off",
+				"noWith": "off",
+				"useGuardForIn": "off"
+			}
+		},
+		"includes": [
+			"**/*.js",
+			"!lib/**",
+			"!dist/**",
+			"!docs/**",
+			"!node_modules/**",
+			"!website/**",
+			"!src/**",
+			"!**/gulpfile.js",
+			"!scripts/module-map.js",
+			"!scripts/jest/preprocessor.js",
+			"!scripts/jest/hasteImpl.js",
+			"!examples/draft-0-10-0/universal/static/bundle.js",
+			"!examples/draft-0-9-1/universal/static/bundle.js"
+		]
+	},
+	"javascript": {
+		"formatter": {
+			"jsxQuoteStyle": "double",
+			"quoteProperties": "asNeeded",
+			"trailingCommas": "all",
+			"semicolons": "always",
+			"arrowParentheses": "always",
+			"bracketSameLine": true,
+			"quoteStyle": "single",
+			"attributePosition": "auto",
+			"bracketSpacing": false
+		},
+		"jsxRuntime": "reactClassic",
+		"globals": [
+			"require",
+			"__DEV__",
+			"requireDynamic",
+			"requireLazy",
+			"afterAll",
+			"afterEach",
+			"beforeAll",
+			"beforeEach",
+			"describe",
+			"expect",
+			"it",
+			"jest",
+			"test"
+		]
+	},
+	"html": {
+		"formatter": {
+			"indentScriptAndStyle": false,
+			"selfCloseVoidElements": "always"
+		}
+	},
+	"overrides": [
+		{
+			"includes": ["examples/draft-0-10-0/**", "examples/draft-0-9-1/**"],
+			"linter": {
+				"rules": {
+					"a11y": {
+						"noNoninteractiveElementInteractions": "off",
+						"noStaticElementInteractions": "off"
+					},
+					"suspicious": { "noConsole": "off" }
+				}
+			}
+		},
+		{
+			"includes": ["examples/draft-0-10-0/universal/**"],
+			"linter": {
+				"rules": {
+					"correctness": { "noUnusedVariables": "off" }
+				}
+			}
+		},
+		{ "includes": ["*.js"] },
+		{ "includes": ["*.md"], "formatter": { "lineWidth": 80 } }
+	],
+	"assist": {
+		"enabled": true,
+		"actions": { "source": { "organizeImports": "on" } }
+	}
+}

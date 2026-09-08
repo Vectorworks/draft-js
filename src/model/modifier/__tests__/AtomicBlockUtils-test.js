@@ -37,7 +37,6 @@ const CHARACTER = ' ';
 
 const getInvariantViolation = (msg: string) => {
   try {
-    /* eslint-disable-next-line */
     invariant(false, msg);
   } catch (e) {
     return e;

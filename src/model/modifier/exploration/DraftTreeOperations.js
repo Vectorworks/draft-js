@@ -21,7 +21,6 @@ const DraftTreeInvariants = require('DraftTreeInvariants');
 const generateRandomKey = require('generateRandomKey');
 const Immutable = require('immutable');
 const invariant = require('invariant');
-const nullthrows = require('nullthrows');
 
 type SiblingInsertPosition = 'previous' | 'next';
 
@@ -29,7 +28,8 @@ const getBlockNode = (
   blockMap: BlockMap,
   key: string,
 ): ContentBlockNodeType => {
-  const block = nullthrows(blockMap.get(key));
+  const block = blockMap.get(key);
+  invariant(block != null, 'Expected tree block with key %s to exist.', key);
   invariant(
     block instanceof ContentBlockNode,
     'Tree block map must contain only ContentBlockNodes.',
@@ -78,14 +78,24 @@ const updateParentChild = (
   let prevSiblingKey: ?BlockNodeKey = null;
   // link new child as next sibling to the correct existing child
   if (position > 0) {
-    prevSiblingKey = nullthrows(existingChildren.get(position - 1));
+    prevSiblingKey = existingChildren.get(position - 1);
+    invariant(
+      prevSiblingKey != null,
+      'Expected previous sibling at child position %s.',
+      position - 1,
+    );
     newBlocks[prevSiblingKey] = getBlockNode(blockMap, prevSiblingKey).merge({
       nextSibling: childKey,
     });
   }
   // link new child as previous sibling to the correct existing child
   if (position < existingChildren.count()) {
-    nextSiblingKey = nullthrows(existingChildren.get(position));
+    nextSiblingKey = existingChildren.get(position);
+    invariant(
+      nextSiblingKey != null,
+      'Expected next sibling at child position %s.',
+      position,
+    );
     newBlocks[nextSiblingKey] = getBlockNode(blockMap, nextSiblingKey).merge({
       prevSibling: childKey,
     });
@@ -332,7 +342,11 @@ const moveChildUp = (blockMap: BlockMap, key: string): BlockMap => {
     parent = getBlockNode(newBlockMap, parentKey);
     // remove as previous sibling of parent's children
     if (parent.getChildKeys().count() > 0) {
-      const firstChildKey = nullthrows(parent.getChildKeys().first());
+      const firstChildKey = parent.getChildKeys().first();
+      invariant(
+        firstChildKey != null,
+        'Expected parent to have a first child.',
+      );
       const firstChild = getBlockNode(newBlockMap, firstChildKey);
       newBlockMap = newBlockMap.set(
         firstChildKey,
@@ -369,7 +383,8 @@ const moveChildUp = (blockMap: BlockMap, key: string): BlockMap => {
     parent = getBlockNode(newBlockMap, parentKey);
     // remove as next sibling of parent's children
     if (parent.getChildKeys().count() > 0) {
-      const lastChildKey = nullthrows(parent.getChildKeys().last());
+      const lastChildKey = parent.getChildKeys().last();
+      invariant(lastChildKey != null, 'Expected parent to have a last child.');
       const lastChild = getBlockNode(newBlockMap, lastChildKey);
       newBlockMap = newBlockMap.set(
         lastChildKey,

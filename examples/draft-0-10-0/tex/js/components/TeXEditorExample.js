@@ -15,7 +15,7 @@
 'use strict';
 
 import Draft from 'draft-js';
-import {Map} from 'immutable';
+import {Map as ImmutableMap} from 'immutable';
 import React from 'react';
 
 import TeXBlock from './TeXBlock';
@@ -30,7 +30,7 @@ export default class TeXEditorExample extends React.Component {
     super(props);
     this.state = {
       editorState: EditorState.createWithContent(content),
-      liveTeXEdits: Map(),
+      liveTeXEdits: ImmutableMap(),
     };
 
     this._blockRenderer = (block) => {
@@ -79,7 +79,7 @@ export default class TeXEditorExample extends React.Component {
 
     this._insertTeX = () => {
       this.setState({
-        liveTeXEdits: Map(),
+        liveTeXEdits: ImmutableMap(),
         editorState: insertTeXBlock(this.state.editorState),
       });
     };

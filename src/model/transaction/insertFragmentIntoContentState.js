@@ -22,7 +22,6 @@ const ContentBlockNode = require('ContentBlockNode');
 const Immutable = require('immutable');
 const insertIntoList = require('insertIntoList');
 const invariant = require('invariant');
-const nullthrows = require('nullthrows');
 const randomizeBlockMapKeys = require('randomizeBlockMapKeys');
 
 const {List} = Immutable;
@@ -40,7 +39,8 @@ const updateExistingBlock = (
   targetOffset: number,
   mergeBlockData?: BlockDataMergeBehavior = 'REPLACE_WITH_NEW_DATA',
 ): ContentState => {
-  const targetBlock = nullthrows(blockMap.get(targetKey));
+  const targetBlock = blockMap.get(targetKey);
+  invariant(targetBlock != null, 'Expected target block to exist.');
   const text = targetBlock.getText();
   const chars = targetBlock.getCharacterList();
   const finalKey = targetKey;
@@ -104,7 +104,11 @@ const updateHead = (
   // Modify head portion of block.
   const headText = text.slice(0, targetOffset);
   const headCharacters = chars.slice(0, targetOffset);
-  const appendToHead = nullthrows(fragment.first());
+  const appendToHead = fragment.first();
+  invariant(
+    appendToHead != null,
+    'Expected fragment to contain a first block.',
+  );
 
   return block.merge({
     text: headText + appendToHead.getText(),
@@ -131,7 +135,11 @@ const updateTail = (
   const blockSize = text.length;
   const tailText = text.slice(targetOffset, blockSize);
   const tailCharacters = chars.slice(targetOffset, blockSize);
-  const prependToTail = nullthrows(fragment.last());
+  const prependToTail = fragment.last();
+  invariant(
+    prependToTail != null,
+    'Expected fragment to contain a last block.',
+  );
 
   return prependToTail.merge({
     text: prependToTail.getText() + tailText,
@@ -164,7 +172,12 @@ const getRootBlocks = (
     }
 
     rootBlocks.push(lastSiblingKey);
-    const nextRootBlock = nullthrows(blockMap.get(lastSiblingKey));
+    const nextRootBlock = blockMap.get(lastSiblingKey);
+    invariant(
+      nextRootBlock != null,
+      'Expected root block with key %s to exist.',
+      lastSiblingKey,
+    );
     invariant(
       nextRootBlock instanceof ContentBlockNode,
       'Root block must be a ContentBlockNode.',
@@ -196,14 +209,13 @@ const updateBlockMapLinks = (
       blockMapState.setIn([headKey, 'prevSibling'], targetKey);
     } else {
       // update the target block that had the fragment head contents merged into it
-      blockMapState.setIn(
-        [targetKey, 'nextSibling'],
-        fragmentHeadBlock.getNextSiblingKey(),
+      const nextSiblingKey = fragmentHeadBlock.getNextSiblingKey();
+      invariant(
+        nextSiblingKey != null,
+        'Expected fragment head block to have a next sibling.',
       );
-      blockMapState.setIn(
-        [nullthrows(fragmentHeadBlock.getNextSiblingKey()), 'prevSibling'],
-        targetKey,
-      );
+      blockMapState.setIn([targetKey, 'nextSibling'], nextSiblingKey);
+      blockMapState.setIn([nextSiblingKey, 'prevSibling'], targetKey);
     }
 
     // update the last root block fragment
@@ -227,7 +239,12 @@ const updateBlockMapLinks = (
 
     // update targetBlock parent child links
     if (targetParentKey) {
-      const targetParent = nullthrows(blockMap.get(targetParentKey));
+      const targetParent = blockMap.get(targetParentKey);
+      invariant(
+        targetParent != null,
+        'Expected target parent block with key %s to exist.',
+        targetParentKey,
+      );
       invariant(
         targetParent instanceof ContentBlockNode,
         'Target parent must be a ContentBlockNode.',
@@ -258,13 +275,20 @@ const insertFragment = (
   targetKey: string,
   targetOffset: number,
 ): ContentState => {
-  const isTreeBasedBlockMap =
-    nullthrows(blockMap.first()) instanceof ContentBlockNode;
+  const firstBlock = blockMap.first();
+  invariant(
+    firstBlock != null,
+    'Expected target block map to contain a block.',
+  );
+  const isTreeBasedBlockMap = firstBlock instanceof ContentBlockNode;
   const newBlockArr = [];
   const fragmentSize = fragment.size;
-  const target = nullthrows(blockMap.get(targetKey));
-  const head = nullthrows(fragment.first());
-  const tail = nullthrows(fragment.last());
+  const target = blockMap.get(targetKey);
+  invariant(target != null, 'Expected target block to exist.');
+  const head = fragment.first();
+  invariant(head != null, 'Expected fragment to contain a first block.');
+  const tail = fragment.last();
+  invariant(tail != null, 'Expected fragment to contain a last block.');
   const finalOffset = tail.getLength();
   const finalKey = tail.getKey();
   const shouldNotUpdateFromFragmentBlock =
@@ -341,7 +365,8 @@ const insertFragmentIntoContentState = (
   const targetKey = selectionState.getStartKey();
   const targetOffset = selectionState.getStartOffset();
 
-  const targetBlock = nullthrows(blockMap.get(targetKey));
+  const targetBlock = blockMap.get(targetKey);
+  invariant(targetBlock != null, 'Expected target block to exist.');
 
   if (targetBlock instanceof ContentBlockNode) {
     invariant(
@@ -353,11 +378,16 @@ const insertFragmentIntoContentState = (
   // When we insert a fragment with a single block we simply update the target block
   // with the contents of the inserted fragment block
   if (fragment.size === 1) {
+    const fragmentBlock = fragment.first();
+    invariant(
+      fragmentBlock != null,
+      'Expected single-block fragment to contain a block.',
+    );
     return updateExistingBlock(
       contentState,
       selectionState,
       blockMap,
-      nullthrows(fragment.first()),
+      fragmentBlock,
       targetKey,
       targetOffset,
       mergeBlockData,

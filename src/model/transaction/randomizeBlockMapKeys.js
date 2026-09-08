@@ -17,7 +17,7 @@ const ContentBlockNode = require('ContentBlockNode');
 
 const generateRandomKey = require('generateRandomKey');
 const Immutable = require('immutable');
-const nullthrows = require('nullthrows');
+const invariant = require('invariant');
 
 const {OrderedMap} = Immutable;
 
@@ -64,7 +64,12 @@ const randomizeContentBlockNodeKeys = (blockMap: BlockMap): BlockMap => {
           }
 
           if (parentKey && blockMapState.get(parentKey)) {
-            const parentBlock = nullthrows(blockMapState.get(parentKey));
+            const parentBlock = blockMapState.get(parentKey);
+            invariant(
+              parentBlock != null,
+              'Expected parent block with key %s to exist.',
+              parentKey,
+            );
             const parentChildrenList = parentBlock.getChildKeys();
             blockMapState.setIn(
               [parentKey, 'children'],
@@ -85,7 +90,13 @@ const randomizeContentBlockNodeKeys = (blockMap: BlockMap): BlockMap => {
               );
             }
 
-            lastRootBlock = nullthrows(blockMapState.get(oldKey));
+            const currentBlock = blockMapState.get(oldKey);
+            invariant(
+              currentBlock != null,
+              'Expected block with key %s to exist.',
+              oldKey,
+            );
+            lastRootBlock = currentBlock;
           }
 
           childrenKeys.forEach(childKey => {
@@ -123,8 +134,9 @@ const randomizeContentBlockKeys = (blockMap: BlockMap): BlockMap => {
 };
 
 const randomizeBlockMapKeys = (blockMap: BlockMap): BlockMap => {
-  const isTreeBasedBlockMap =
-    nullthrows(blockMap.first()) instanceof ContentBlockNode;
+  const firstBlock = blockMap.first();
+  invariant(firstBlock != null, 'Expected block map to contain a block.');
+  const isTreeBasedBlockMap = firstBlock instanceof ContentBlockNode;
 
   if (!isTreeBasedBlockMap) {
     return randomizeContentBlockKeys(blockMap);

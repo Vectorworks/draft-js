@@ -16,7 +16,7 @@ import type SelectionState from 'SelectionState';
 
 const DraftOffsetKey = require('DraftOffsetKey');
 
-const nullthrows = require('nullthrows');
+const invariant = require('invariant');
 
 function getUpdatedSelectionState(
   editorState: EditorState,
@@ -25,11 +25,11 @@ function getUpdatedSelectionState(
   focusKey: string,
   focusOffset: number,
 ): SelectionState {
-  const selection: SelectionState = nullthrows(editorState.getSelection());
+  const selection = editorState.getSelection();
+  invariant(selection != null, 'Expected editor state to have a selection.');
   if (!anchorKey || !focusKey) {
     // If we cannot make sense of the updated selection state, stick to the current one.
     if (__DEV__) {
-      /* eslint-disable-next-line */
       console.warn('Invalid selection state.', arguments, editorState.toJS());
     }
     return selection;
@@ -60,7 +60,6 @@ function getUpdatedSelectionState(
   if (!anchorLeaf || !focusLeaf) {
     // If we cannot make sense of the updated selection state, stick to the current one.
     if (__DEV__) {
-      /* eslint-disable-next-line */
       console.warn('Invalid selection state.', arguments, editorState.toJS());
     }
     return selection;

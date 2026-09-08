@@ -64,7 +64,7 @@ export default class TeXBlock extends React.Component {
       var invalid = false;
       try {
         katex.__parse(value);
-      } catch (e) {
+      } catch (_error) {
         invalid = true;
       } finally {
         this.setState({
@@ -104,7 +104,7 @@ export default class TeXBlock extends React.Component {
   _getValue() {
     return this.props.contentState
       .getEntity(this.props.block.getEntityAt(0))
-      .getData()['content'];
+      .getData().content;
   }
 
   render() {

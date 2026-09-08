@@ -27,7 +27,7 @@ const RichTextEditorUtil = require('RichTextEditorUtil');
 const getEntityKeyForSelection = require('getEntityKeyForSelection');
 const getTextContentFromFiles = require('getTextContentFromFiles');
 const isEventHandled = require('isEventHandled');
-const nullthrows = require('nullthrows');
+const invariant = require('invariant');
 const splitTextIntoTextBlocks = require('splitTextIntoTextBlocks');
 
 /**
@@ -129,17 +129,25 @@ function editOnPaste(editor: DraftEditor, e: SyntheticClipboardEvent<>): void {
       data.isRichText() &&
       internalClipboard
     ) {
+      // If the editorKey is present in the pasted HTML, it should be safe to
+      // assume this is an internal paste.
+      let isInternalPaste = html?.indexOf(editor.getEditorKey()) !== -1;
       if (
-        // If the editorKey is present in the pasted HTML, it should be safe to
-        // assume this is an internal paste.
-        html?.indexOf(editor.getEditorKey()) !== -1 ||
-        // The copy may have been made within a single block, in which case the
-        // editor key won't be part of the paste. In this case, just check
-        // whether the pasted text matches the internal clipboard.
-        (textBlocks.length === 1 &&
-          internalClipboard.size === 1 &&
-          nullthrows(internalClipboard.first()).getText() === text)
+        !isInternalPaste &&
+        textBlocks.length === 1 &&
+        internalClipboard.size === 1
       ) {
+        const firstBlock = internalClipboard.first();
+        invariant(
+          firstBlock != null,
+          'Expected single-block internal clipboard to contain a block.',
+        );
+        isInternalPaste = firstBlock.getText() === text;
+      }
+      // The copy may have been made within a single block, in which case the
+      // editor key won't be part of the paste. In this case, just check
+      // whether the pasted text matches the internal clipboard.
+      if (isInternalPaste) {
         handleInternalPaste = () =>
           editor.update(
             insertFragment(editor._latestEditorState, internalClipboard),

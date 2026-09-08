@@ -39,7 +39,6 @@ const initialBlock = contentState.getBlockMap().first();
 
 const getInvariantViolation = (msg: string) => {
   try {
-    /* eslint-disable-next-line */
     invariant(false, msg);
   } catch (e) {
     return e;

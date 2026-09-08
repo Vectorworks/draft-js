@@ -17,7 +17,6 @@ const findAncestorOffsetKey = require('findAncestorOffsetKey');
 const getWindowForNode = require('getWindowForNode');
 const Immutable = require('immutable');
 const invariant = require('invariant');
-const nullthrows = require('nullthrows');
 
 const {Map} = Immutable;
 
@@ -145,7 +144,11 @@ class DOMObserver {
   registerMutation(mutation: MutationRecordT): void {
     const textContent = this.getMutationTextContent(mutation);
     if (textContent != null) {
-      const offsetKey = nullthrows(findAncestorOffsetKey(mutation.target));
+      const offsetKey = findAncestorOffsetKey(mutation.target);
+      invariant(
+        offsetKey != null,
+        'Expected mutation target to be within an editor leaf.',
+      );
       this.mutations = this.mutations.set(offsetKey, textContent);
     }
   }

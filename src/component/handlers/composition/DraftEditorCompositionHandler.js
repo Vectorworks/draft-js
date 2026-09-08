@@ -24,7 +24,7 @@ const editOnSelect = require('editOnSelect');
 const getContentEditableContainer = require('getContentEditableContainer');
 const getDraftEditorSelection = require('getDraftEditorSelection');
 const getEntityKeyForSelection = require('getEntityKeyForSelection');
-const nullthrows = require('nullthrows');
+const invariant = require('invariant');
 
 const isIE = UserAgent.isBrowser('IE');
 
@@ -153,7 +153,11 @@ const DraftEditorCompositionHandler = {
     }
 
     const lastEditorState = editor._latestEditorState;
-    const mutations = nullthrows(domObserver).stopAndFlushMutations();
+    invariant(
+      domObserver != null,
+      'Expected a DOM observer while resolving composition.',
+    );
+    const mutations = domObserver.stopAndFlushMutations();
     domObserver = null;
     resolved = true;
 
@@ -191,11 +195,14 @@ const DraftEditorCompositionHandler = {
         offsetKey,
       );
 
-      const {start, end} = nullthrows(
-        editorState
-          .getBlockTree(blockKey)
-          .getIn([decoratorKey, 'leaves', leafKey]),
+      const leaf = editorState
+        .getBlockTree(blockKey)
+        .getIn([decoratorKey, 'leaves', leafKey]);
+      invariant(
+        leaf != null,
+        'Expected composition mutation to reference an existing editor leaf.',
       );
+      const {start, end} = leaf;
 
       const replacementRange = editorState.getSelection().merge({
         anchorKey: blockKey,

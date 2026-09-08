@@ -33,7 +33,6 @@ const generateRandomKey = require('generateRandomKey');
 const gkx = require('gkx');
 const Immutable = require('immutable');
 const invariant = require('invariant');
-const nullthrows = require('nullthrows');
 
 const experimentalTreeDataSupport = gkx('draft_tree_data_support');
 
@@ -307,9 +306,15 @@ const convertFromRawToDraftState = (
   const blockMap = decodeRawBlocks(rawState, entityKeyMap);
 
   // create initial selection
-  const selectionState = blockMap.isEmpty()
-    ? new SelectionState()
-    : SelectionState.createEmpty(nullthrows(blockMap.first()).getKey());
+  let selectionState = new SelectionState();
+  if (!blockMap.isEmpty()) {
+    const firstBlock = blockMap.first();
+    invariant(
+      firstBlock != null,
+      'Expected non-empty block map to contain a block.',
+    );
+    selectionState = SelectionState.createEmpty(firstBlock.getKey());
+  }
 
   return new ContentState({
     blockMap,

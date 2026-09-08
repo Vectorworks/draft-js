@@ -14,7 +14,7 @@
 import type ContentState from 'ContentState';
 import type SelectionState from 'SelectionState';
 
-const nullthrows = require('nullthrows');
+const invariant = require('invariant');
 
 function adjustBlockDepthForContentState(
   contentState: ContentState,
@@ -25,11 +25,13 @@ function adjustBlockDepthForContentState(
   const startKey = selectionState.getStartKey();
   const endKey = selectionState.getEndKey();
   let blockMap = contentState.getBlockMap();
+  const endBlock = blockMap.get(endKey);
+  invariant(endBlock != null, 'Expected selection end block to exist.');
   const blocks = blockMap
     .toSeq()
     .skipUntil((_, k) => k === startKey)
     .takeUntil((_, k) => k === endKey)
-    .concat([[endKey, nullthrows(blockMap.get(endKey))]])
+    .concat([[endKey, endBlock]])
     .map(block => {
       let depth = block.getDepth() + adjustment;
       depth = Math.max(0, depth);

@@ -23,12 +23,12 @@ const ContentBlockNode = require('ContentBlockNode');
 const getNextDelimiterBlockKey = require('getNextDelimiterBlockKey');
 const Immutable = require('immutable');
 const invariant = require('invariant');
-const nullthrows = require('nullthrows');
 
 const {List} = Immutable;
 
 const getBlockNode = (blockMap: BlockMap, key: string): ContentBlockNode => {
-  const block = nullthrows(blockMap.get(key));
+  const block = blockMap.get(key);
+  invariant(block != null, 'Expected tree block with key %s to exist.', key);
   invariant(
     block instanceof ContentBlockNode,
     'Tree block map must contain only ContentBlockNodes.',
@@ -318,8 +318,10 @@ const removeRangeFromContentState = (
   const endKey = selectionState.getEndKey();
   const endOffset = selectionState.getEndOffset();
 
-  const startBlock = nullthrows(blockMap.get(startKey));
-  const endBlock = nullthrows(blockMap.get(endKey));
+  const startBlock = blockMap.get(startKey);
+  invariant(startBlock != null, 'Expected selection start block to exist.');
+  const endBlock = blockMap.get(endKey);
+  invariant(endBlock != null, 'Expected selection end block to exist.');
 
   // used to retain blocks that should not be deleted to avoid orphan children
   let parentAncestors: Array<string> = [];

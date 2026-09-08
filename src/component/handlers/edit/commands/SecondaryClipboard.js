@@ -18,7 +18,7 @@ const DraftModifier = require('DraftModifier');
 const EditorState = require('EditorState');
 
 const getContentStateFragment = require('getContentStateFragment');
-const nullthrows = require('nullthrows');
+const invariant = require('invariant');
 
 let clipboard: ?BlockMap = null;
 
@@ -49,7 +49,10 @@ const SecondaryClipboard = {
       targetRange = selection;
     }
 
-    targetRange = nullthrows(targetRange);
+    invariant(
+      targetRange != null,
+      'Expected secondary clipboard target range.',
+    );
     // TODO: This should actually append to the current state when doing
     // successive ^K commands without any other cursor movement
     clipboard = getContentStateFragment(content, targetRange);
