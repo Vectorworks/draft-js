@@ -25,7 +25,7 @@ provide information about the text that the user has written.
 ```js
 const MyInput = () => {
   const [value, setValue] = useState('');
-  const onChange = (evt) => setValue(evt.target.value);
+  const onChange = evt => setValue(evt.target.value);
 
   return <input value={value} onChange={onChange} />;
 };

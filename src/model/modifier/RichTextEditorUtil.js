@@ -139,8 +139,9 @@ const RichTextEditorUtil: RichTextUtils = {
     }
 
     // If that doesn't succeed, try to remove the current block style.
-    const withoutBlockStyle =
-      RichTextEditorUtil.tryToRemoveBlockStyle(editorState);
+    const withoutBlockStyle = RichTextEditorUtil.tryToRemoveBlockStyle(
+      editorState,
+    );
 
     if (withoutBlockStyle) {
       return EditorState.push(

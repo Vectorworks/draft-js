@@ -751,7 +751,9 @@ class ContentBlocksBuilder {
    * Extract the text and the associated inline styles form an
    * array of content block configs.
    */
-  _extractTextFromBlockConfigs(blockConfigs: Array<ContentBlockConfig>): {
+  _extractTextFromBlockConfigs(
+    blockConfigs: Array<ContentBlockConfig>,
+  ): {
     text: string,
     characterList: List<CharacterMetadata>,
     ...

@@ -95,7 +95,8 @@ class ContentState extends ContentStateRecord {
   }
 
   getBlockForKey(key: string): BlockNodeRecord {
-    return nullthrows(this.getBlockMap().get(key));
+    // $FlowFixMe[incompatible-return] Missing keys return undefined by API.
+    return this.getBlockMap().get(key);
   }
 
   getKeyBefore(key: string): ?string {

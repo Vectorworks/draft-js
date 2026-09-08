@@ -4,7 +4,7 @@ title: CharacterMetadata
 ---
 
 `CharacterMetadata` is an Immutable
-[Record](https://web.archive.org/web/20150623131347/http://facebook.github.io:80/immutable-js/docs/#/Record) 
+[Record](https://web.archive.org/web/20150623131347/http://facebook.github.io:80/immutable-js/docs/#/Record)
 that represents inline style and entity information for a single character.
 
 `CharacterMetadata` objects are aggressively pooled and shared. If two characters

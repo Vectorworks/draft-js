@@ -43,9 +43,10 @@ const haste = {
       return undefined;
     }
 
+    const relativePath = toPosixPath(path.relative(ROOT, filePath));
     const hasteName = NAME_REDUCERS.reduce(
       (name, [pattern, replacement]) => name.replace(pattern, replacement),
-      filePath
+      relativePath,
     );
 
     return hasteName;
@@ -57,15 +58,26 @@ function isHastePath(filePath/*: string*/)/*: bool*/ {
     return false;
   }
 
-  if (!filePath.startsWith(ROOT)) {
+  const relativePath = toPosixPath(path.relative(ROOT, filePath));
+  if (
+    relativePath === '' ||
+    relativePath === '..' ||
+    relativePath.startsWith('../') ||
+    path.isAbsolute(relativePath)
+  ) {
     return false;
   }
 
-  filePath = filePath.substr(ROOT.length + 1);
-  if (BLACKLISTED_PATTERNS.some(pattern => pattern.test(filePath))) {
+  if (BLACKLISTED_PATTERNS.some(pattern => pattern.test(relativePath))) {
     return false;
   }
-  return WHITELISTED_PREFIXES.some(prefix => filePath.startsWith(prefix));
+  return WHITELISTED_PREFIXES.some(prefix =>
+    relativePath.startsWith(`${prefix}/`),
+  );
+}
+
+function toPosixPath(filePath/*: string*/)/*: string*/ {
+  return filePath.replace(/\\/g, '/');
 }
 
 module.exports = haste;

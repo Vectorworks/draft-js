@@ -4,7 +4,7 @@ title: ContentState
 ---
 
 `ContentState` is an Immutable
-[Record](https://web.archive.org/web/20150623131347/http://facebook.github.io:80/immutable-js/docs/#/Record) 
+[Record](https://web.archive.org/web/20150623131347/http://facebook.github.io:80/immutable-js/docs/#/Record)
 that represents the full state of:
 
 - The entire **contents** of an editor: text, block and inline styles, and entity ranges.

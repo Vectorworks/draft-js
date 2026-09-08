@@ -18,28 +18,30 @@
   <img src="https://media.giphy.com/media/XHUjaxELpc11SiRSqN/giphy.gif" alt="Live Demo" />
 </p>
 
---------------------
+---
+
 ## Status
 
 **THIS PROJECT IS CURRENTLY IN MAINTENANCE MODE. It will not receive any feature updates, only critical security bug patches. On 31st December 2022 the repo will be fully archived.**
 
 For users looking for an open source alternative, Meta have been working on migrating to a new framework, called [Lexical](https://github.com/facebook/lexical). It's still experimental, and we're working on adding migration guides, but, we believe, it provides a more performant and accessible alternative.
 
---------------------
+---
+
 Draft.js is a JavaScript rich text editor framework, built for React and
 backed by an immutable model.
 
 - **Extensible and Customizable:** We provide the building blocks to enable
-the creation of a broad variety of rich text composition experiences, from
-basic text styles to embedded media.
+  the creation of a broad variety of rich text composition experiences, from
+  basic text styles to embedded media.
 - **Declarative Rich Text:** Draft.js fits seamlessly into
-[React](http://facebook.github.io/react/) applications,
-abstracting away the details of rendering, selection, and input behavior with a
-familiar declarative API.
+  [React](http://facebook.github.io/react/) applications,
+  abstracting away the details of rendering, selection, and input behavior with a
+  familiar declarative API.
 - **Immutable Editor State:** The Draft.js model is built
-with [immutable-js](https://facebook.github.io/immutable-js/), offering
-an API with functional state updates and aggressively leveraging data persistence
-for scalable memory usage.
+  with [immutable-js](https://facebook.github.io/immutable-js/), offering
+  an API with functional state updates and aggressively leveraging data persistence
+  for scalable memory usage.
 
 [Learn how to use Draft.js in your own project.](https://draftjs.org/docs/getting-started/)
 
@@ -50,7 +52,7 @@ comment inputs, [Notes](https://www.facebook.com/notes/), and
 ## API Notice
 
 Before getting started, please be aware that we recently changed the API of
-Entity storage in Draft. 
+Entity storage in Draft.
 
 Previously, the old API was set to be removed in `v0.11.0`. Since, the plans have changed— `v0.11.0` still supports the old API and `v0.12.0` will remove it. Refer to [the docs](https://draftjs.org/docs/v0-10-api-migration) for more information and information on how to migrate.
 
@@ -86,7 +88,7 @@ import {Editor, EditorState} from '@vectorworks/draft-js';
 
 function MyEditor() {
 
-  
+
   constructor(props) {
     super(props);
     this.state = {editorState: EditorState.createEmpty()};
@@ -133,15 +135,14 @@ ReactDOM.render(
 
 Since the release of React 16.8, you can use [Hooks](https://reactjs.org/docs/hooks-intro.html) as a way to work with `EditorState` without using a class.
 
-
 ```js
-import React from "react";
-import { Editor, EditorState } from "@vectorworks/draft-js";
-import "@vectorworks/draft-js/dist/Draft.css";
+import React from 'react';
+import {Editor, EditorState} from '@vectorworks/draft-js';
+import '@vectorworks/draft-js/dist/Draft.css';
 
 export default function MyEditor() {
   const [editorState, setEditorState] = React.useState(() =>
-    EditorState.createEmpty()
+    EditorState.createEmpty(),
   );
 
   const editor = React.useRef(null);
@@ -151,9 +152,8 @@ export default function MyEditor() {
 
   return (
     <div
-      style={{ border: "1px solid black", minHeight: "6em", cursor: "text" }}
-      onClick={focusEditor}
-    >
+      style={{border: '1px solid black', minHeight: '6em', cursor: 'text'}}
+      onClick={focusEditor}>
       <Editor
         ref={editor}
         editorState={editorState}
@@ -163,7 +163,6 @@ export default function MyEditor() {
     </div>
   );
 }
-
 ```
 
 Note that the editor itself is only as tall as its contents. In order to give users a visual cue, we recommend setting a border and a minimum height via the `.DraftEditor-root` CSS selector, or using a wrapper div like in the above example.
@@ -196,8 +195,8 @@ To run the examples in the `/examples` directory, first build Draft.js locally a
 ## Browser Support
 
 | ![IE / Edge](https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_32x32.png) <br /> IE / Edge | ![Firefox](https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_32x32.png) <br /> Firefox | ![Chrome](https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_32x32.png) <br /> Chrome | ![Safari](https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_32x32.png) <br /> Safari | ![iOS Safari](https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari-ios/safari-ios_32x32.png) <br />iOS Safari | ![Chrome for Android](https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_32x32.png) <br/> Chrome for Android |
-| --------- | --------- | --------- | --------- | --------- | --------- |
-| IE11, Edge [1, 2]| last 2 versions| last 2 versions| last 2 versions| not fully supported [3] | not fully supported [3]
+| ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| IE11, Edge [1, 2]                                                                                                   | last 2 versions                                                                                                       | last 2 versions                                                                                                   | last 2 versions                                                                                                   | not fully supported [3]                                                                                                          | not fully supported [3]                                                                                                                  |
 
 [1] May need a shim or a polyfill for some syntax used in Draft.js ([docs](https://draftjs.org/docs/advanced-topics-issues-and-pitfalls/#polyfills)).
 

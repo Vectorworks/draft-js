@@ -10,6 +10,7 @@
  */
 
 'use strict';
+
 import type ContentState from 'ContentState';
 
 const BlockMapBuilder = require('BlockMapBuilder');

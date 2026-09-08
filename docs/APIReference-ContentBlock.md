@@ -4,7 +4,7 @@ title: ContentBlock
 ---
 
 `ContentBlock` is an Immutable
-[Record](https://web.archive.org/web/20150623131347/http://facebook.github.io:80/immutable-js/docs/#/Record) 
+[Record](https://web.archive.org/web/20150623131347/http://facebook.github.io:80/immutable-js/docs/#/Record)
 that represents the full state of a single block of editor content, including:
 
 - Plain text contents of the block

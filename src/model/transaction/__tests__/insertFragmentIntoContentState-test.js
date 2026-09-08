@@ -44,6 +44,7 @@ const getInvariantViolation = (msg: string) => {
   } catch (e) {
     return e;
   }
+  return null;
 };
 
 const createFragment = (

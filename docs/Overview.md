@@ -83,8 +83,8 @@ import {Editor, EditorState} from '@vectorworks/draft-js';
 import '@vectorworks/draft-js/dist/Draft.css';
 
 function MyEditor() {
-  const [editorState, setEditorState] = React.useState(
-    () => EditorState.createEmpty(),
+  const [editorState, setEditorState] = React.useState(() =>
+    EditorState.createEmpty(),
   );
 
   return <Editor editorState={editorState} onChange={setEditorState} />;
