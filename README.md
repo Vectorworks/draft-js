@@ -177,7 +177,9 @@ Further examples of how Draft.js can be used are provided in the `/examples` dir
 
 ### Building Draft.js
 
-Draft.js is built with [Yarn](https://classic.yarnpkg.com/en/) v1. Using other package managers mgiht work, but is not officially supported.
+Draft.js is built with Node.js 24 and
+[Yarn](https://classic.yarnpkg.com/en/) v1. Using other package managers mgiht
+work, but is not officially supported.
 
 To clone and build, run:
 

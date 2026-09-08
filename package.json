@@ -24,7 +24,7 @@
   "license": "MIT",
   "scripts": {
     "prepublish": "npm run build",
-    "pretest": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
+    "pretest": "node scripts/check-node-version.js",
     "build": "gulp",
     "dev": "gulp dev",
     "postbuild": "node node_modules/fbjs-scripts/node/check-lib-requires.js lib",
@@ -35,7 +35,7 @@
     "format-docs:diff": "prettier --config prettier.config.js --list-different \"docs/**/*.md\"",
     "flow": "flow src",
     "test": "cross-env NODE_ENV=test jest",
-    "test-ci": "cross-env NODE_ENV=test npm run lint && npm run flow && npm run test"
+    "test-ci": "yarn lint && yarn flow && yarn test"
   },
   "dependencies": {
     "fbjs": "^3.0.4",
@@ -89,8 +89,11 @@
     "webpack-stream": "6.1.0"
   },
   "devEngines": {
-    "node": "14.x || 16.x",
-    "npm": "2.x || 3.x || 5.x || 6.x || 7.x || 8.x"
+    "runtime": {
+      "name": "node",
+      "version": "24.x",
+      "onFail": "error"
+    }
   },
   "jest": {
     "globals": {

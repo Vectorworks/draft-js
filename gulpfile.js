@@ -78,6 +78,7 @@ var COPYRIGHT_HEADER = `/**
 
 const buildDist = opts => {
   const webpackOpts = {
+    mode: 'production',
     externals: {
       immutable: {
         root: 'Immutable',
@@ -99,9 +100,13 @@ const buildDist = opts => {
       },
     },
     output: {
+      hashFunction: 'sha256',
       filename: opts.output,
       libraryTarget: 'umd',
       library: 'Draft',
+    },
+    optimization: {
+      minimize: false,
     },
     plugins: [
       new webpackStream.webpack.DefinePlugin({
