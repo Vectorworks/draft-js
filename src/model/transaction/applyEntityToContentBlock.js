@@ -14,6 +14,7 @@
 import type {BlockNodeRecord} from 'BlockNodeRecord';
 
 const CharacterMetadata = require('CharacterMetadata');
+const invariant = require('invariant');
 
 function applyEntityToContentBlock(
   contentBlock: BlockNodeRecord,
@@ -24,9 +25,15 @@ function applyEntityToContentBlock(
   let start = startArg;
   let characterList = contentBlock.getCharacterList();
   while (start < end) {
+    const character = characterList.get(start);
+    invariant(
+      character != null,
+      'Expected character metadata at selection offset %s.',
+      start,
+    );
     characterList = characterList.set(
       start,
-      CharacterMetadata.applyEntity(characterList.get(start), entityKey),
+      CharacterMetadata.applyEntity(character, entityKey),
     );
     start++;
   }

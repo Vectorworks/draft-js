@@ -19,7 +19,6 @@ const getSelectionOffsetKeyForNode = require('getSelectionOffsetKeyForNode');
 const getUpdatedSelectionState = require('getUpdatedSelectionState');
 const invariant = require('invariant');
 const isElement = require('isElement');
-const nullthrows = require('nullthrows');
 
 type SelectionPoint = {
   key: string,
@@ -45,12 +44,22 @@ function getDraftEditorSelectionWithNodes(
   // Find the nearest offset-aware elements and use the
   // offset values supplied by the selection range.
   if (anchorIsTextNode && focusIsTextNode) {
+    const anchorKey = findAncestorOffsetKey(anchorNode);
+    invariant(
+      anchorKey != null,
+      'Expected anchor node to be within an editor leaf.',
+    );
+    const focusKey = findAncestorOffsetKey(focusNode);
+    invariant(
+      focusKey != null,
+      'Expected focus node to be within an editor leaf.',
+    );
     return {
       selectionState: getUpdatedSelectionState(
         editorState,
-        nullthrows(findAncestorOffsetKey(anchorNode)),
+        anchorKey,
         anchorOffset,
-        nullthrows(findAncestorOffsetKey(focusNode)),
+        focusKey,
         focusOffset,
       ),
       needsRecovery: false,
@@ -80,14 +89,24 @@ function getDraftEditorSelectionWithNodes(
   // ensure proper selection state maintenance.
 
   if (anchorIsTextNode) {
+    const anchorKey = findAncestorOffsetKey(anchorNode);
+    invariant(
+      anchorKey != null,
+      'Expected anchor node to be within an editor leaf.',
+    );
     anchorPoint = {
-      key: nullthrows(findAncestorOffsetKey(anchorNode)),
+      key: anchorKey,
       offset: anchorOffset,
     };
     focusPoint = getPointForNonTextNode(root, focusNode, focusOffset);
   } else if (focusIsTextNode) {
+    const focusKey = findAncestorOffsetKey(focusNode);
+    invariant(
+      focusKey != null,
+      'Expected focus node to be within an editor leaf.',
+    );
     focusPoint = {
-      key: nullthrows(findAncestorOffsetKey(focusNode)),
+      key: focusKey,
       offset: focusOffset,
     };
     anchorPoint = getPointForNonTextNode(root, anchorNode, anchorOffset);
@@ -198,7 +217,11 @@ function getPointForNonTextNode(
       key = offsetKey;
     } else {
       const firstLeaf = getFirstLeaf(node);
-      key = nullthrows(getSelectionOffsetKeyForNode(firstLeaf));
+      key = getSelectionOffsetKeyForNode(firstLeaf);
+      invariant(
+        key != null,
+        'Expected first editor leaf to have an offset key.',
+      );
     }
     return {key, offset: 0};
   }
@@ -212,13 +235,21 @@ function getPointForNonTextNode(
     // Our target node may be a leaf or a text node, in which case we're
     // already where we want to be and can just use the child's length as
     // our offset.
-    leafKey = nullthrows(offsetKey);
+    leafKey = offsetKey;
+    invariant(
+      leafKey != null,
+      'Expected selection node to be within an editor leaf.',
+    );
     textLength = getTextContentLength(nodeBeforeCursor);
   } else {
     // Otherwise, we'll look at the child to the left of the cursor and find
     // the last leaf node in its subtree.
     const lastLeaf = getLastLeaf(nodeBeforeCursor);
-    leafKey = nullthrows(getSelectionOffsetKeyForNode(lastLeaf));
+    leafKey = getSelectionOffsetKeyForNode(lastLeaf);
+    invariant(
+      leafKey != null,
+      'Expected last editor leaf to have an offset key.',
+    );
     textLength = getTextContentLength(lastLeaf);
   }
 

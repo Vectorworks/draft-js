@@ -15,20 +15,16 @@ import type {DraftInlineStyle} from 'DraftInlineStyle';
 
 const {Map, OrderedSet, Record} = require('immutable');
 
-// Immutable.map is typed such that the value for every key in the map
-// must be the same type
-type CharacterMetadataConfigValueType = DraftInlineStyle | ?string;
-type CharacterMetadataConfigRawValueType = Array<string> | ?string;
-
 export type CharacterMetadataRawConfig = {
-  style?: CharacterMetadataConfigRawValueType,
-  entity?: CharacterMetadataConfigRawValueType,
+  style?: Array<string>,
+  entity?: ?string,
   ...
 };
 
-type CharacterMetadataConfig = interface {
-  style?: CharacterMetadataConfigValueType,
-  entity?: CharacterMetadataConfigValueType,
+type CharacterMetadataConfig = {
+  style?: DraftInlineStyle,
+  entity?: ?string,
+  ...
 };
 
 const EMPTY_SET = OrderedSet<string>();
@@ -116,7 +112,7 @@ class CharacterMetadata extends CharacterMetadataRecord {
   }: CharacterMetadataRawConfig): CharacterMetadata {
     return new CharacterMetadata({
       style: Array.isArray(style) ? OrderedSet(style) : style,
-      entity: Array.isArray(entity) ? OrderedSet(entity) : entity,
+      entity,
     });
   }
 }

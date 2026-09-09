@@ -35,7 +35,7 @@ function myBlockStyleFn(contentBlock) {
 }
 
 // Then...
-import {Editor} from 'draft-js';
+import {Editor} from '@vectorworks/draft-js';
 class EditorWithFancyBlockquotes extends React.Component {
   render() {
     return <Editor ... blockStyleFn={myBlockStyleFn} />;

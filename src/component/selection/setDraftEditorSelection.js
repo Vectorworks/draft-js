@@ -273,7 +273,7 @@ function addFocusToSelection(
       }
     } catch (e) {
       DraftJsDebugLogging.logSelectionStateFailure({
-        anonymizedDom: getAnonymizedEditorDOM(node, function (n) {
+        anonymizedDom: getAnonymizedEditorDOM(node, function(n) {
           const labels = [];
           if (n === activeElement) {
             labels.push('active element');
@@ -351,7 +351,6 @@ function addPointToSelection(
       selection.addRange(range);
     } catch (e) {
       if (__DEV__) {
-        /* eslint-disable-next-line no-console */
         console.warn('Call to selection.addRange() threw exception: ', e);
       }
     }

@@ -48,7 +48,7 @@ function myBlockRenderer(contentBlock) {
 }
 
 // Then...
-import {Editor} from 'draft-js';
+import {Editor} from '@vectorworks/draft-js';
 class EditorWithMedia extends React.Component {
   ...
   render() {

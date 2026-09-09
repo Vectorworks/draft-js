@@ -41,7 +41,7 @@ write your contents to the server as a draft copy.
 First, let's define our key binding function:
 
 ```js
-import {getDefaultKeyBinding, KeyBindingUtil} from 'draft-js';
+import {getDefaultKeyBinding, KeyBindingUtil} from '@vectorworks/draft-js';
 const {hasCommandModifier} = KeyBindingUtil;
 
 function myKeyBindingFn(e: SyntheticKeyboardEvent): string | null {
@@ -63,7 +63,7 @@ In our editor component, we can then make use of the command via the
 `handleKeyCommand` prop:
 
 ```js
-import {Editor} from 'draft-js';
+import {Editor} from '@vectorworks/draft-js';
 class MyEditor extends React.Component {
 
   constructor(props) {

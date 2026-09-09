@@ -306,9 +306,15 @@ const convertFromRawToDraftState = (
   const blockMap = decodeRawBlocks(rawState, entityKeyMap);
 
   // create initial selection
-  const selectionState = blockMap.isEmpty()
-    ? new SelectionState()
-    : SelectionState.createEmpty(blockMap.first().getKey());
+  let selectionState = new SelectionState();
+  if (!blockMap.isEmpty()) {
+    const firstBlock = blockMap.first();
+    invariant(
+      firstBlock != null,
+      'Expected non-empty block map to contain a block.',
+    );
+    selectionState = SelectionState.createEmpty(firstBlock.getKey());
+  }
 
   return new ContentState({
     blockMap,

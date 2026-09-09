@@ -139,7 +139,12 @@ const DraftEntity: DraftEntityMapObject = {
   },
 
   last(): DraftEntityInstance {
-    return instances.last();
+    const lastInstance = instances.last();
+    invariant(
+      lastInstance != null,
+      'Cannot get the last entity when none exist.',
+    );
+    return lastInstance;
   },
 
   /**

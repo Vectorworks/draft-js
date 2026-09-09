@@ -168,7 +168,6 @@ test('must render multiple leaf nodes', () => {
 
   assertLeaves(blockInstance.children[0].children, [
     {
-      /* eslint-disable-next-line fb-www/gender-neutral-language */
       text: 'he',
       offsetKey: 'a-0-0',
       start: 0,

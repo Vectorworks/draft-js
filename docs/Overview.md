@@ -16,18 +16,29 @@ Draft.js was introduced at [React.js Conf](https://conf2016.reactjs.org/schedule
 
 Draft.js is distributed via npm. It depends on React and React DOM which must also be installed.
 
+This fork is published to GitHub Packages. Configure the Vectorworks package
+scope in your project's `.npmrc`:
+
+```ini
+@vectorworks:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+Set `GITHUB_TOKEN` to a GitHub Packages token with the `read:packages`
+permission. Do not commit a literal token to `.npmrc`.
+
 ```sh
-npm install draft-js react react-dom
+npm install @vectorworks/draft-js react react-dom
 # or alternately
-yarn add draft-js react react-dom
+yarn add @vectorworks/draft-js react react-dom
 ```
 
 Draft.js uses some modern ECMAScript features which are not available to IE11 and not part of create-react-app's default babel config. If you're running into problems out-of-the-box try installing a shim or polyfill alongside Draft.
 
 ```sh
-npm install draft-js react react-dom babel-polyfill
+npm install @vectorworks/draft-js react react-dom babel-polyfill
 # or
-yarn add draft-js react react-dom es6-shim
+yarn add @vectorworks/draft-js react react-dom es6-shim
 ```
 
 Learn more about [using a shim with Draft](/docs/advanced-topics-issues-and-pitfalls#polyfills).
@@ -43,8 +54,8 @@ and new API. Following that up will be `v0.12.0` which will remove the old API.
 ```js
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Editor, EditorState} from 'draft-js';
-import 'draft-js/dist/Draft.css';
+import {Editor, EditorState} from '@vectorworks/draft-js';
+import '@vectorworks/draft-js/dist/Draft.css';
 
 class MyEditor extends React.Component {
   constructor(props) {
@@ -68,12 +79,12 @@ Since the release of React 16.8, you can use [Hooks](https://reactjs.org/docs/ho
 ```js
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Editor, EditorState} from 'draft-js';
-import 'draft-js/dist/Draft.css';
+import {Editor, EditorState} from '@vectorworks/draft-js';
+import '@vectorworks/draft-js/dist/Draft.css';
 
 function MyEditor() {
-  const [editorState, setEditorState] = React.useState(
-    () => EditorState.createEmpty(),
+  const [editorState, setEditorState] = React.useState(() =>
+    EditorState.createEmpty(),
   );
 
   return <Editor editorState={editorState} onChange={setEditorState} />;

@@ -25,7 +25,7 @@ const joinClasses: (
   className?: ?string,
   ...classes: Array<?string>
 ) => string = require('joinClasses');
-const nullthrows = require('nullthrows');
+const invariant = require('invariant');
 const React = require('react');
 
 type Props = {
@@ -142,7 +142,11 @@ class DraftEditorContents extends React.Component<Props> {
     const selection = editorState.getSelection();
     const forceSelection = editorState.mustForceSelection();
     const decorator = editorState.getDecorator();
-    const directionMap = nullthrows(editorState.getDirectionMap());
+    const directionMap = editorState.getDirectionMap();
+    invariant(
+      directionMap != null,
+      'Expected editor state to have a direction map.',
+    );
 
     const blocksAsArray = content.getBlocksAsArray();
     const processedBlocks = [];
@@ -166,6 +170,11 @@ class DraftEditorContents extends React.Component<Props> {
       const direction = textDirectionality
         ? textDirectionality
         : directionMap.get(key);
+      invariant(
+        direction != null,
+        'Expected a text direction for block with key %s.',
+        key,
+      );
       const offsetKey = DraftOffsetKey.encode(key, 0, 0);
       const componentProps = {
         contentState: content,
@@ -183,12 +192,15 @@ class DraftEditorContents extends React.Component<Props> {
         tree: editorState.getBlockTree(key),
       };
 
-      const configForType =
-        blockRenderMap.get(blockType) || blockRenderMap.get('unstyled');
+      const unstyledConfig = blockRenderMap.get('unstyled');
+      invariant(
+        unstyledConfig != null,
+        'Expected block render map to include an unstyled configuration.',
+      );
+      const configForType = blockRenderMap.get(blockType) || unstyledConfig;
       const wrapperTemplate = configForType.wrapper;
 
-      const Element =
-        configForType.element || blockRenderMap.get('unstyled').element;
+      const Element = configForType.element || unstyledConfig.element;
 
       const depth = block.getDepth();
       let className = '';

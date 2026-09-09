@@ -22,7 +22,7 @@ const editOnInput = require('editOnInput');
 const getEntityKeyForSelection = require('getEntityKeyForSelection');
 const isEventHandled = require('isEventHandled');
 const isSelectionAtLeafStart = require('isSelectionAtLeafStart');
-const nullthrows = require('nullthrows');
+const invariant = require('invariant');
 const setImmediate = require('setImmediate');
 
 // When nothing is focused, Firefox regards two characters, `'` and `/`, as
@@ -229,9 +229,14 @@ function editOnBeforeInput(
     mustPreventNative = mustPreventDefaultForCharacter(chars);
   }
   if (!mustPreventNative) {
+    const newDirectionMap = newEditorState.getDirectionMap();
+    const directionMap = editorState.getDirectionMap();
+    invariant(
+      newDirectionMap != null && directionMap != null,
+      'Expected editor states to have direction maps.',
+    );
     mustPreventNative =
-      nullthrows(newEditorState.getDirectionMap()).get(anchorKey) !==
-      nullthrows(editorState.getDirectionMap()).get(anchorKey);
+      newDirectionMap.get(anchorKey) !== directionMap.get(anchorKey);
   }
 
   if (mustPreventNative) {

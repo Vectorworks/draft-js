@@ -35,7 +35,7 @@ We can observe and handle key commands via the `handleKeyCommand` prop, and
 hook these into `RichUtils` to apply or remove the desired style.
 
 ```js
-import {Editor, EditorState, RichUtils} from 'draft-js';
+import {Editor, EditorState, RichUtils} from '@vectorworks/draft-js';
 
 class MyEditor extends React.Component {
   constructor(props) {

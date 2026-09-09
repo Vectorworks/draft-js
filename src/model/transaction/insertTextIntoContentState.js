@@ -45,6 +45,7 @@ function insertTextIntoContentState(
   const key = selectionState.getStartKey();
   const offset = selectionState.getStartOffset();
   const block = blockMap.get(key);
+  invariant(block != null, 'Expected selection start block to exist.');
   const blockText = block.getText();
 
   const newBlock = block.merge({

@@ -53,14 +53,13 @@ function getRangeClientRectsChrome(range: Range): Array<ClientRect> {
     'Found an unexpected detached subtree when getting range client rects.',
   );
 }
-/* eslint-enable consistent-return */
 
 /**
  * Like range.getClientRects() but normalizes for browser bugs.
  */
 const getRangeClientRects = ((isChrome
   ? getRangeClientRectsChrome
-  : function (range: Range): Array<ClientRect> {
+  : function(range: Range): Array<ClientRect> {
       return Array.from(range.getClientRects());
     }): (range: Range) => Array<ClientRect>);
 

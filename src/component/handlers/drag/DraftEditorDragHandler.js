@@ -24,7 +24,7 @@ const getTextContentFromFiles = require('getTextContentFromFiles');
 const getUpdatedSelectionState = require('getUpdatedSelectionState');
 const getWindowForNode = require('getWindowForNode');
 const isEventHandled = require('isEventHandled');
-const nullthrows = require('nullthrows');
+const invariant = require('invariant');
 
 /**
  * Get a SelectionState for the supplied mouse event.
@@ -54,9 +54,13 @@ function getSelectionForEvent(
     return null;
   }
 
-  node = nullthrows(node);
-  offset = nullthrows(offset);
-  const offsetKey = nullthrows(findAncestorOffsetKey(node));
+  invariant(node != null, 'Expected drop event to provide a target node.');
+  invariant(offset != null, 'Expected drop event to provide a target offset.');
+  const offsetKey = findAncestorOffsetKey(node);
+  invariant(
+    offsetKey != null,
+    'Expected drop event target to be within an editor leaf.',
+  );
 
   return getUpdatedSelectionState(
     editorState,

@@ -82,7 +82,7 @@ For example, you may want to add a `'STRIKETHROUGH'` style. To do so, define a
 custom style map:
 
 ```js
-import {Editor} from 'draft-js';
+import {Editor} from '@vectorworks/draft-js';
 
 const styleMap = {
   'STRIKETHROUGH': {

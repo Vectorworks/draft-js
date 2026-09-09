@@ -6,8 +6,6 @@
  * @typechecks
  */
 
-/*eslint-disable no-bitwise */
-
 /**
  * Based on the rfc4122-compliant solution posted at
  * http://stackoverflow.com/questions/105034

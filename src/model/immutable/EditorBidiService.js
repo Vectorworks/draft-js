@@ -16,7 +16,7 @@ import type ContentState from 'ContentState';
 const UnicodeBidiService = require('UnicodeBidiService');
 
 const Immutable = require('immutable');
-const nullthrows = require('nullthrows');
+const invariant = require('invariant');
 
 const {OrderedMap} = Immutable;
 
@@ -34,9 +34,13 @@ const EditorBidiService = {
     }
 
     const blockMap = content.getBlockMap();
+    invariant(
+      bidiService != null,
+      'Expected Unicode bidi service to be initialized.',
+    );
     const nextBidi = blockMap
       .valueSeq()
-      .map(block => nullthrows(bidiService).getDirection(block.getText()));
+      .map(block => bidiService.getDirection(block.getText()));
     const bidiMap = OrderedMap(blockMap.keySeq().zip(nextBidi));
 
     if (prevBidiMap != null && Immutable.is(prevBidiMap, bidiMap)) {

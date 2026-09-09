@@ -25,7 +25,7 @@ import type {BidiDirection} from 'UnicodeBidiDirection';
 const DraftEditorBlockNode = require('DraftEditorBlockNode.react');
 const DraftOffsetKey = require('DraftOffsetKey');
 
-const nullthrows = require('nullthrows');
+const invariant = require('invariant');
 const React = require('react');
 
 type Props = {
@@ -113,7 +113,11 @@ class DraftEditorContentsExperimental extends React.Component<Props> {
     const selection = editorState.getSelection();
     const forceSelection = editorState.mustForceSelection();
     const decorator = editorState.getDecorator();
-    const directionMap = nullthrows(editorState.getDirectionMap());
+    const directionMap = editorState.getDirectionMap();
+    invariant(
+      directionMap != null,
+      'Expected editor state to have a direction map.',
+    );
 
     const blocksAsArray = content.getBlocksAsArray();
     const rootBlock = blocksAsArray[0];
@@ -142,9 +146,13 @@ class DraftEditorContentsExperimental extends React.Component<Props> {
         tree: editorState.getBlockTree(blockKey),
       };
 
+      const unstyledConfig = blockRenderMap.get('unstyled');
+      invariant(
+        unstyledConfig != null,
+        'Expected block render map to include an unstyled configuration.',
+      );
       const configForType =
-        blockRenderMap.get(nodeBlock.getType()) ||
-        blockRenderMap.get('unstyled');
+        blockRenderMap.get(nodeBlock.getType()) || unstyledConfig;
       const wrapperTemplate = configForType.wrapper;
       processedBlocks.push({
         /* $FlowFixMe[incompatible-type] (>=0.112.0 site=www,mobile) This

@@ -134,12 +134,15 @@ const getDraftRenderConfig = (
   block: BlockNodeRecord,
   blockRenderMap: DraftBlockRenderMap,
 ): DraftRenderConfig => {
-  const configForType =
-    blockRenderMap.get(block.getType()) || blockRenderMap.get('unstyled');
+  const unstyledConfig = blockRenderMap.get('unstyled');
+  invariant(
+    unstyledConfig != null,
+    'Expected block render map to include an unstyled configuration.',
+  );
+  const configForType = blockRenderMap.get(block.getType()) || unstyledConfig;
 
   const wrapperTemplate = configForType.wrapper;
-  const Element =
-    configForType.element || blockRenderMap.get('unstyled').element;
+  const Element = configForType.element || unstyledConfig.element;
 
   return {
     Element,

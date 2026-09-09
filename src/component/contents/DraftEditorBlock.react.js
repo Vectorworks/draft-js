@@ -33,7 +33,6 @@ const getScrollPosition = require('getScrollPosition');
 const getViewportDimensions = require('getViewportDimensions');
 const invariant = require('invariant');
 const isHTMLElement = require('isHTMLElement');
-const nullthrows = require('nullthrows');
 const React = require('react');
 
 const SCROLL_BUFFER = 10;
@@ -189,7 +188,11 @@ class DraftEditorBlock extends React.Component<Props> {
           return leaves;
         }
 
-        const decorator = nullthrows(this.props.decorator);
+        const decorator = this.props.decorator;
+        invariant(
+          decorator != null,
+          'Expected a decorator for a decorated leaf set.',
+        );
 
         const DecoratorComponent = decorator.getComponentForKey(decoratorKey);
         if (!DecoratorComponent) {

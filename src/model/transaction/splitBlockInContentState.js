@@ -96,6 +96,7 @@ const splitBlockInContentState = (
   const key = selectionState.getAnchorKey();
   const blockMap = contentState.getBlockMap();
   const blockToSplit = blockMap.get(key);
+  invariant(blockToSplit != null, 'Expected selection block to exist.');
   const text = blockToSplit.getText();
 
   if (!text) {

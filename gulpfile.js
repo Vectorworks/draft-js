@@ -17,11 +17,12 @@ const babel = require('gulp-babel');
 const cleanCSS = require('gulp-clean-css');
 const concatCSS = require('gulp-concat-css');
 const derequire = require('gulp-derequire');
+const fancyLog = require('fancy-log');
 const flatten = require('gulp-flatten');
 const header = require('gulp-header');
 const gulpif = require('gulp-if');
 const rename = require('gulp-rename');
-const gulpUtil = require('gulp-util');
+const PluginError = require('plugin-error');
 const StatsPlugin = require('stats-webpack-plugin');
 const through = require('through2');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
@@ -46,9 +47,9 @@ const babelOptsJS = {
     }),
   ],
   plugins: [
-    require('@babel/plugin-proposal-nullish-coalescing-operator'),
-    require('@babel/plugin-proposal-optional-chaining'),
-    require('@babel/plugin-proposal-optional-catch-binding'),
+    require('@babel/plugin-transform-nullish-coalescing-operator'),
+    require('@babel/plugin-transform-optional-chaining'),
+    require('@babel/plugin-transform-optional-catch-binding'),
   ],
 };
 
@@ -60,9 +61,9 @@ const babelOptsFlow = {
     }),
   ],
   plugins: [
-    require('@babel/plugin-proposal-nullish-coalescing-operator'),
-    require('@babel/plugin-proposal-optional-chaining'),
-    require('@babel/plugin-proposal-optional-catch-binding'),
+    require('@babel/plugin-transform-nullish-coalescing-operator'),
+    require('@babel/plugin-transform-optional-chaining'),
+    require('@babel/plugin-transform-optional-catch-binding'),
   ],
 };
 
@@ -78,6 +79,7 @@ var COPYRIGHT_HEADER = `/**
 
 const buildDist = opts => {
   const webpackOpts = {
+    mode: 'production',
     externals: {
       immutable: {
         root: 'Immutable',
@@ -99,9 +101,13 @@ const buildDist = opts => {
       },
     },
     output: {
+      hashFunction: 'sha256',
       filename: opts.output,
       libraryTarget: 'umd',
       library: 'Draft',
+    },
+    optimization: {
+      minimize: false,
     },
     plugins: [
       new webpackStream.webpack.DefinePlugin({
@@ -122,10 +128,10 @@ const buildDist = opts => {
   }
   const wpStream = webpackStream(webpackOpts, null, function(err, stats) {
     if (err) {
-      throw new gulpUtil.PluginError('webpack', err);
+      throw new PluginError('webpack', err);
     }
     if (stats.compilation.errors.length) {
-      gulpUtil.log('webpack', '\n' + stats.toString({colors: true}));
+      fancyLog('webpack', '\n' + stats.toString({colors: true}));
     }
   });
   return wpStream;

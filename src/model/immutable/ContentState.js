@@ -31,6 +31,7 @@ const generateRandomKey = require('generateRandomKey');
 const getOwnObjectValues = require('getOwnObjectValues');
 const gkx = require('gkx');
 const Immutable = require('immutable');
+const invariant = require('invariant');
 const sanitizeDraftText = require('sanitizeDraftText');
 
 const {List, Record, Repeat, Map: ImmutableMap, OrderedMap} = Immutable;
@@ -94,8 +95,8 @@ class ContentState extends ContentStateRecord {
   }
 
   getBlockForKey(key: string): BlockNodeRecord {
-    const block: BlockNodeRecord = this.getBlockMap().get(key);
-    return block;
+    // $FlowFixMe[incompatible-return] Missing keys return undefined by API.
+    return this.getBlockMap().get(key);
   }
 
   getKeyBefore(key: string): ?string {
@@ -131,15 +132,27 @@ class ContentState extends ContentStateRecord {
   }
 
   getBlocksAsArray(): Array<BlockNodeRecord> {
-    return this.getBlockMap().toArray();
+    return this.getBlockMap()
+      .valueSeq()
+      .toArray();
   }
 
   getFirstBlock(): BlockNodeRecord {
-    return this.getBlockMap().first();
+    const firstBlock = this.getBlockMap().first();
+    invariant(
+      firstBlock != null,
+      'Expected content state to contain a first block.',
+    );
+    return firstBlock;
   }
 
   getLastBlock(): BlockNodeRecord {
-    return this.getBlockMap().last();
+    const lastBlock = this.getBlockMap().last();
+    invariant(
+      lastBlock != null,
+      'Expected content state to contain a last block.',
+    );
+    return lastBlock;
   }
 
   getPlainText(delimiter?: string): string {
@@ -157,10 +170,12 @@ class ContentState extends ContentStateRecord {
 
   hasText(): boolean {
     const blockMap = this.getBlockMap();
+    const firstBlock = blockMap.first();
+    invariant(firstBlock != null, 'Expected content state to contain a block.');
     return (
       blockMap.size > 1 ||
       // make sure that there are no zero width space chars
-      escape(blockMap.first().getText()).replace(/%u200B/g, '').length > 0
+      escape(firstBlock.getText()).replace(/%u200B/g, '').length > 0
     );
   }
 
@@ -254,9 +269,15 @@ class ContentState extends ContentStateRecord {
     // TODO: remove this when we completely deprecate the old entity API
     const theBlocks = Array.isArray(blocks) ? blocks : blocks.contentBlocks;
     const blockMap = BlockMapBuilder.createFromArray(theBlocks);
-    const selectionState = blockMap.isEmpty()
-      ? new SelectionState()
-      : SelectionState.createEmpty(blockMap.first().getKey());
+    let selectionState = new SelectionState();
+    if (!blockMap.isEmpty()) {
+      const firstBlock = blockMap.first();
+      invariant(
+        firstBlock != null,
+        'Expected non-empty block map to contain a block.',
+      );
+      selectionState = SelectionState.createEmpty(firstBlock.getKey());
+    }
     return new ContentState({
       blockMap,
       entityMap: entityMap || DraftEntity,
@@ -285,7 +306,9 @@ class ContentState extends ContentStateRecord {
   static fromJS(state: ContentStateRawType): ContentState {
     return new ContentState({
       ...state,
-      blockMap: OrderedMap<string, BlockNodeRawConfig>(state.blockMap).map(
+      blockMap: OrderedMap<string, BlockNodeRawConfig>(
+        state.blockMap || OrderedMap<string, BlockNodeRawConfig>(),
+      ).map(
         // $FlowFixMe[method-unbinding]
         ContentState.createContentBlockFromJS,
       ),
