@@ -9,7 +9,7 @@
     "richtext"
   ],
   "homepage": "http://draftjs.org/",
-  "bugs": "https://github.com/facebook/draft-js/issues",
+  "bugs": "https://github.com/Vectorworks/draft-js/issues",
   "files": [
     "dist/",
     "lib/",
@@ -17,7 +17,10 @@
   ],
   "main": "lib/Draft.js",
   "style": "dist/Draft.css",
-  "repository": "facebook/draft-js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vectorworks/draft-js.git"
+  },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },

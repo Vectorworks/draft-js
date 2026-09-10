@@ -24,8 +24,11 @@ scope in your project's `.npmrc`:
 //npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
 ```
 
-Set `GITHUB_TOKEN` to a GitHub Packages token with the `read:packages`
-permission. Do not commit a literal token to `.npmrc`.
+For GitHub Actions in this repository, `GITHUB_TOKEN` must have the
+`packages: read` permission. Jenkins and other external build systems must use
+a classic GitHub token with the `read:packages` scope, and the token's user or
+repository must be granted access to the package. Do not commit a literal
+token to `.npmrc`.
 
 ```sh
 npm install @vectorworks/draft-js react react-dom
