@@ -9,9 +9,9 @@
 
 const packageData = require('./package.json');
 const moduleMap = require('./scripts/module-map');
+const checkDependencies = require('./scripts/check-dependencies');
 const fbjsConfigurePreset = require('babel-preset-fbjs/configure');
 const del = require('del');
-const gulpCheckDependencies = require('fbjs-scripts/gulp/check-dependencies');
 const gulp = require('gulp');
 const babel = require('gulp-babel');
 const cleanCSS = require('gulp-clean-css');
@@ -243,9 +243,9 @@ exports.dist_min = gulp.series(exports.modules, function outputDistMin() {
     .pipe(gulp.dest(paths.dist));
 });
 
-// Checks for "wrong" dependencies (file://, for example).
+// Checks that direct dependencies are installed and valid.
 exports.check_dependencies = function check_dependencies() {
-  return gulp.src('package.json').pipe(gulpCheckDependencies());
+  return checkDependencies(process.cwd());
 };
 
 // Watches to build modules
