@@ -17,10 +17,7 @@
   ],
   "main": "lib/Draft.js",
   "style": "dist/Draft.css",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Vectorworks/draft-js.git"
-  },
+  "repository": "https://github.com/Vectorworks/draft-js.git",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
